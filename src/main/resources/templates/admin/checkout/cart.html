@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Səbətim</title>
+</head>
+<body>
+
+<h1>Sifariş Məlumatları</h1>
+  th:if="${order}">
+    <p>Sifariş ID-si: <span th:text="${order.id}"></span></p>
+    <p>Ümumi Məbləğ: <span th:text="${order.totalAmount}"></span> AZN</p>
+
+    <form th:action="@{/api/orders/create-payment}" method="post">
+        <input type="hidden" name="orderId" th:value="${order.id}" />
+        <button type="submit" style="padding: 10px 20px; font-size: 16px;">Ödənişə Keç</button>
+    </form>
+</div>
+
+<div th:unless="${order}">
+    <p>Səbətinizdə sifariş yoxdur.</p>
+</div>
+
+</body>
+</html>

@@ -1,22 +1,33 @@
 package com.myapp.myapp.services;
 
-import com.myapp.myapp.dtos.ProductCreateDto;
-import com.myapp.myapp.dtos.ProductDto;
-import com.myapp.myapp.dtos.ProductUpdateDto;
+import com.myapp.myapp.dtos.ProductDtos.ProductCreateDto;
+import com.myapp.myapp.dtos.ProductDtos.ProductDto;
+import com.myapp.myapp.dtos.ProductDtos.ProductUpdateDto;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
-// Bu interface məhsullarla bağlı biznes məntiqinin müqaviləsini təyin edir.
-// "ProductServiceImpl" sinfi bu interface'i implement edir.
 public interface ProductService {
-    // Verilənlər bazasından bütün məhsulları gətirir və ProductDto siyahısı şəklində qaytarır.
+    // Bütün məhsulları qaytarır
     List<ProductDto> getAllProducts();
-    // Yeni məhsul əlavə edir. Uğurlu olarsa true, əks halda false qaytarır.
-    boolean addProduct(ProductCreateDto productCreateDto, MultipartFile image);
-    // ID-yə görə məhsulu tapır və ProductUpdateDto obyekti şəklində qaytarır.
-    ProductUpdateDto getProductUpdateDtoById(Long id);
-    // Mövcud məhsulu yeniləyir.
-    boolean updateProduct(ProductUpdateDto productUpdateDto, MultipartFile image);
-    // ID-yə görə məhsulu silir.
-    boolean deleteProduct(Long id);
+
+    // ID ilə məhsulu qaytarır
+    ProductDto getProductsId(Long id);
+
+    // Yeni məhsul yaradır (DTO və şəkil faylını qəbul edir)
+    boolean createProducts(ProductCreateDto productCreateDto, MultipartFile image);
+
+    // Mövcud məhsulu yeniləyir (ID, DTO və şəkil faylını qəbul edir)
+    boolean updateProducts(ProductUpdateDto productUpdateDto, Long id, MultipartFile image);
+
+    // Məhsulu silir
+    boolean deleteProducts(Long id);
+
+    // Yeniləmə forması üçün məhsul məlumatlarını tapır
+    ProductUpdateDto findProductById(Long id);
+
+    // Açar sözə əsasən məhsulları axtarır
+    List<ProductDto> searchProducts(String keyword);
+
+    // YENİ METOD: Məhsulların ümumi sayını gətirir (Workers sayğacı üçün)
+    long countProducts(); // 👈 Bu hissəni əlavə edin!
 }

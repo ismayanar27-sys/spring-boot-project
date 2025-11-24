@@ -25,4 +25,18 @@ public class CloudinaryService {
             throw new RuntimeException("Şəkil yüklənərkən xəta baş verdi.", e);
         }
     }
+
+    // Bu metodu əlavə etməlisiniz!
+    public void deleteImage(String photoUrl) {
+        if (photoUrl != null && !photoUrl.isEmpty()) {
+            try {
+                // Public ID-ni URL-dən çıxarırıq (son slash-dan sonra və . uzantısından əvvəlki hissə)
+                String publicId = photoUrl.substring(photoUrl.lastIndexOf("/") + 1, photoUrl.lastIndexOf("."));
+                cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            } catch (IOException e) {
+                // Şəkil silinərkən xəta baş verərsə, onu qeyd edirik
+                e.printStackTrace();
+            }
+        }
+    }
 }

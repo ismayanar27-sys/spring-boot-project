@@ -11,53 +11,102 @@
     .container {
         margin-top: 50px;
     }
+    /* Cədvəldəki şəkil üçün üslub */
     .table img {
-        width: 100px;
-        height: auto;
+        width: 80px; /* Şəklin ölçüsü kiçildildi */
+        height: 80px;
+        object-fit: cover; /* Şəkli kəsmədən uyğunlaşdırır */
         border-radius: 8px;
+    }
+    .action-buttons a, .action-buttons button {
+        margin: 2px;
     }
   </style>
 </head>
 <body>
 <div class="container">
   <h1 class="mb-4">Məhsulların Siyahısı</h1>
-  <a th:href="@{/admin/products/add}" class="btn btn-primary mb-3">Yeni Məhsul Əlavə Et</a>
 
-  <table class="table table-striped table-hover">
+  <!-- UĞUR VƏ XƏTA MESAJLARI (Bootstrap Alert-Dismissible əlavə edildi) -->
+  <!-- Uğur Mesajı -->
+  <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${successMessage}">Uğurlu əməliyyat mesajı.</span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <!-- Xəta Mesajı -->
+  <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${errorMessage}">Xəta baş verdi.</span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <!-- Mesaj bloklarının sonu -->
+
+  <div class="row mb-4 align-items-center">
+    <!-- Axtarış Formu -->
+    <div class="col-md-6">
+      <form th:action="@{/admin/products}" method="get" class="d-flex">
+        <input type="text" name="keyword" th:value="${keyword}" class="form-control me-2" placeholder="Ad, brend və ya qoxuya görə axtar..." style="border-radius: 8px;">
+        <button type="submit" class="btn btn-primary" style="border-radius: 8px;">Axtar</button>
+      </form>
+    </div>
+    <!-- Yeni Məhsul Əlavə Et Butonu -->
+    <div class="col-md-6 text-end">
+      <a th:href="@{/admin/products/add}" class="btn btn-success" style="border-radius: 8px;">
+        <i class="bi bi-plus-circle"></i> Yeni Məhsul Əlavə Et
+      </a>
+    </div>
+  </div>
+
+  <table class="table table-striped table-hover shadow-sm">
     <thead class="table-dark">
     <tr>
       <th scope="col">ID</th>
-      <th scope="col">Ad</th>
-      <th scope="col">Qiymət</th>
-      <th scope="col">Brend</th>
-      <th scope="col">Həcm</th>
-      <th scope="col">Qoxu</th>
-      <th scope="col">Kateqoriya</th>
       <th scope="col">Şəkil</th>
+      <th scope="col">Ad</th>
+      <th scope="col">Qiymət (AZN)</th>
+      <th scope="col">Brend</th>
+      <th scope="col">Həcm (ml)</th>
+      <th scope="col">Qoxu/Tərkib</th>
+      <th scope="col">Kateqoriya</th>
       <th scope="col">Əməliyyatlar</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="product : ${products}">
-      <td th:text="${product.id}"></td>
-      <td th:text="${product.name}"></td>
-      <td th:text="${product.price}"></td>
-      <td th:text="${product.brand}"></td>
-      <td th:text="${product.volume}"></td>
-      <td th:text="${product.scent}"></td>
-      <td th:text="${product.category}"></td>
+      <td th:text="${product.id}">1</td>
       <td>
-        <img th:src="${product.photoUrl}" alt="Məhsul şəkli">
+        <img th:src="${product.photoUrl}" alt="Məhsul şəkli" th:onerror="|this.onerror=null; this.src='https://placehold.co/80x80/cccccc/333333?text=No+Img'|">
       </td>
-      <td>
+      <td th:text="${product.name}">Parfüm Adı</td>
+      <td th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}">150.00</td>
+      <td th:text="${product.brand}">Dior</td>
+      <td th:text="${product.volume}">100</td>
+      <td th:text="${product.scent}">Gül/Oud</td>
+      <td th:text="${product.category}">Unisex</td>
+      <td class="action-buttons">
         <a th:href="@{/admin/products/edit/{id}(id=${product.id})}" class="btn btn-sm btn-warning">Düzəliş Et</a>
         <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post" style="display:inline;">
-          <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Məhsulu silmək istədiyinizə əminsiniz?');">Sil</button>
+          <!-- Təqdimat üçün alert funksiyasını işlək saxlayırıq -->
+          <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Məhsulu silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarılmır.');">Sil</button>
         </form>
+      </td>
+    </tr>
+    <!-- Məhsul yoxdursa boş sətir göstər -->
+    <tr th:if="${products.empty}">
+      <td colspan="9" class="text-center p-4">
+        Axtarışınıza uyğun **məhsul tapılmadı**. Zəhmət olmasa axtarış sözünü dəyişdirin və ya <a th:href="@{/admin/products}" class="alert-link">bütün məhsullara</a> baxın.
       </td>
     </tr>
     </tbody>
   </table>
+
+  <!-- Səhifələşdirmə (Əgər əlavə etsəniz, bura yerləşdiriləcək) -->
+  <nav aria-label="Səhifələr" th:if="${!products.empty}">
+    <ul class="pagination justify-content-center">
+      <!-- Səhifələşdirmə elementi əlavə oluna bilər -->
+    </ul>
+  </nav>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
