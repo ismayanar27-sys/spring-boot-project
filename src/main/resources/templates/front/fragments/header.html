@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<header id="header" class="header d-flex align-items-center sticky-top" th:fragment="header">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+
+        <a th:href="@{/index}" class="logo d-flex align-items-center me-auto me-xl-0">
+            <h1 class="sitename">Yummy</h1>
+            <span>.</span>
+        </a>
+
+        <nav id="navmenu" class="navmenu">
+            <ul>
+                <li><a th:href="@{/index#hero}" class="active">Ana Səhifə<br></a></li>
+                <li><a th:href="@{/index#about}">Haqqımızda</a></li>
+                <li><a th:href="@{/index#menu}">Menyu</a></li>
+                <li><a th:href="@{/index#events}">Tədbirlər</a></li>
+                <li><a th:href="@{/index#chefs}">Aşpazlar</a></li>
+                <li><a th:href="@{/index#gallery}">Qalereya</a></li>
+                <li class="dropdown"><a href="#"><span>Açılan Menyu</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                    <ul>
+                        <li><a href="#">Dropdown 1</a></li>
+                        <li class="dropdown"><a href="#"><span>Dərin Açılan Menyu</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                            <ul>
+                                <li><a href="#">Deep Dropdown 1</a></li>
+                                <li><a href="#">Deep Dropdown 2</a></li>
+                                <li><a href="#">Deep Dropdown 3</a></li>
+                                <li><a href="#">Deep Dropdown 4</a></li>
+                                <li><a href="#">Deep Dropdown 5</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">Dropdown 2</a></li>
+                        <li><a href="#">Dropdown 3</a></li>
+                        <li><a href="#">Dropdown 4</a></li>
+                    </ul>
+                </li>
+                <li><a th:href="@{/index#contact}">Əlaqə</a></li>
+            </ul>
+            <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
+        <a class="btn-getstarted" th:href="@{/index#book-a-table}">Sifariş Et</a>
+
+    </div>
+</header>
+</body>
+</html>

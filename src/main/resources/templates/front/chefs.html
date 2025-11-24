@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Aşpazlar | Yummy. Veb Saytınız</title>
+    <style>
+        .chefs-section {
+            padding: 80px 0;
+            background-color: #ffffff;
+        }
+        .chef-member {
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .chef-member img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 4px solid #ffb03c; /* Rənginizi tənzimləyin */
+        }
+        .chef-member h4 {
+            font-weight: 700;
+            color: #333;
+        }
+        .chef-member span {
+            display: block;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+<section id="chefs" class="chefs-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5" style="color: #ffb03c;">Peşəkar Aşpazlarımız</h2>
+            <p class="text-muted">Bizim ləzzətli təamlarımızın arxasındakı yaradıcı beyinlər.</p>
+        </div>
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-4 col-md-6">
+                <div class="chef-member">
+                    <img th:src="@{/assets/img/chefs/chef-1.jpg}" alt="Aşpaz Nümunə 1" class="img-fluid">
+                    <h4>Əli Əliyev</h4>
+                    <span>Baş Aşpaz (Executive Chef)</span>
+                    <p>
+                        Əli Qafqaz və Aralıq dənizi mətbəxinin sirlərinə yiyələnib. 15 illik təcrübəsi ilə o, menyumuzun ruhudur.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="chef-member">
+                    <img th:src="@{/assets/img/chefs/chef-2.jpg}" alt="Aşpaz Nümunə 2" class="img-fluid">
+                    <h4>Aynur Quliyeva</h4>
+                    <span>Şirniyyatçı Aşpaz (Pastry Chef)</span>
+                    <p>
+                        Aynur fransız şirniyyatları üzrə ixtisaslaşmışdır və bütün desertlərimizə öz incə toxunuşunu qatır.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="chef-member">
+                    <img th:src="@{/assets/img/chefs/chef-3.jpg}" alt="Aşpaz Nümunə 3" class="img-fluid">
+                    <h4>Samir Vəliyev</h4>
+                    <span>Sous Chef</span>
+                    <p>
+                        Samir ənənəvi Azərbaycan mətbəxinin sadiq qalasıdır. O, milli təamların hazırlanmasında əvəzsizdir.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

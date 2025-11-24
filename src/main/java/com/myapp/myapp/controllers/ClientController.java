@@ -7,12 +7,12 @@ import com.myapp.myapp.services.ClientService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-@Controller // Spring'e bu sinfin bir web kontroller olduğunu bildirir.
-@RequestMapping("/clients") // Bu kontrollerdeki bütün URL-ler "/clients" ile başlayacaq.
+@Controller
+@RequestMapping("/admin/clients")
 public class ClientController {
 
     private final ClientService clientService;
@@ -21,51 +21,65 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    @GetMapping // "/clients" URL-ine gelen GET sorğularını emal edir.
-    public String getAllClients(Model model) {
-        List<ClientDto> clients = clientService.getAllClients();
+    // Əsas müştərilər siyahısı və axtarış nəticələrini göstərmək üçün metod
+    @GetMapping
+    public String getAllClients(@RequestParam(value = "keyword", required = false) String keyword, Model model) {
+        List<ClientDto> clients;
+        // Əgər axtarış sözü (keyword) boş deyilsə, axtarış funksiyasını işə sal.
+        if (keyword != null && !keyword.isEmpty()) {
+            clients = clientService.searchClients(keyword);
+            // Frontend-də axtarış inputunun dəyərini saxlamaq üçün əlavə edirik.
+            model.addAttribute("keyword", keyword);
+        } else {
+            // Əks halda, bütün müştərilərin siyahısını göstər.
+            clients = clientService.getAllClients();
+        }
         model.addAttribute("clients", clients);
-        return "clients-list"; // "templates/clients-list.html" sehifesini gösterir.
+        return "admin/clients/clients-list";
     }
 
-    @GetMapping("/{id}") // Müştəri ID-si ile melumatları getirir.
+    @GetMapping("/{id}")
     public String getClientById(@PathVariable Long id, Model model) {
         ClientDto client = clientService.getClientsId(id);
         model.addAttribute("client", client);
-        return "client-details"; // "templates/client-details.html" sehifesini gösterir.
+        return "admin/clients/client-details";
     }
 
-    @GetMapping("/add") // Yeni müştəri elave etmek üçün formanı gösterir.
+    @GetMapping("/add")
     public String addClientForm(Model model) {
         model.addAttribute("clientCreateDto", new ClientCreateDto());
-        return "client-add"; // "templates/client-add.html" sehifesini gösterir.
+        return "admin/clients/client-add";
     }
 
-    @PostMapping("/add") // Yeni müştəri elave etmek üçün POST sorğusunu emal edir.
+    @PostMapping("/add")
     public String addClient(@ModelAttribute ClientCreateDto clientCreateDto,
-                            @RequestParam("image") MultipartFile image) {
-        clientService.createClients(clientCreateDto, image);
-        return "redirect:/clients"; // Müştəri siyahısı sehifesine yönlendirir.
+                            RedirectAttributes redirectAttributes) {
+        clientService.createClients(clientCreateDto);
+        redirectAttributes.addFlashAttribute("successMessage", "Müştəri uğurla əlavə edildi!");
+        return "redirect:/admin/clients";
     }
 
-    @GetMapping("/update/{id}") // Müştəri melumatlarını yenilemek üçün formanı gösterir.
-    public String updateClientForm(@PathVariable Long id, Model model) {
+    @GetMapping("/edit/{id}")
+    public String editClientForm(@PathVariable Long id, Model model) {
         ClientUpDateDto clientUpDateDto = clientService.findClientById(id);
         model.addAttribute("clientUpDateDto", clientUpDateDto);
-        return "client-update"; // "templates/client-update.html" sehifesini gösterir.
+        return "admin/clients/client-update";
     }
 
-    @PostMapping("/update/{id}") // Müştəri melumatlarını yenilemek üçün POST sorğusunu emal edir.
+    @PostMapping("/update/{id}")
     public String updateClient(@PathVariable Long id,
                                @ModelAttribute ClientUpDateDto clientUpDateDto,
-                               @RequestParam("image") MultipartFile image) {
-        clientService.updateClients(clientUpDateDto, id, image);
-        return "redirect:/clients"; // Müştəri siyahısı sehifesine yönlendirir.
-    }
-    @PostMapping("/delete/{id}") // Müştərini silmək üçün POST sorğusunu emal edir.
-    public String deleteClient(@PathVariable Long id) {
-        clientService.deleteClients(id);
-        return "redirect:/clients"; // Müştəri siyahısı səhifəsinə yönləndirir.
-    }
+                               RedirectAttributes redirectAttributes) {
+        clientService.updateClients(clientUpDateDto, id);
+        redirectAttributes.addFlashAttribute("successMessage", "Müştəri uğurla yeniləndi!");
+        return "redirect:/admin/clients";
     }
 
+    @PostMapping("/delete/{id}")
+    public String deleteClient(@PathVariable Long id,
+                               RedirectAttributes redirectAttributes) {
+        clientService.deleteClients(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Müştəri uğurla silindi!");
+        return "redirect:/admin/clients";
+    }
+}

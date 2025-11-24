@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Menyu | Məhsullarımız</title>
+
+    <link th:href="@{/assets/img/favicon.png}" rel="icon">
+    <link th:href="@{/assets/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/bootstrap-icons/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/aos/aos.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/glightbox/css/glightbox.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/swiper/swiper-bundle.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/css/main.css}" rel="stylesheet">
+    <style>
+        /* Sizin XÜSUSİ Stiliniz burada qalır */
+        .menu-section {
+            padding: 120px 0 80px 0; /* Header-in altından başlamaq üçün padding-i artırdım */
+            background-color: #f7f7f7;
+        }
+        .menu-title {
+            color: #ffb03c;
+            font-weight: 700;
+        }
+        .card-img-top {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        .product-card {
+            transition: transform 0.3s ease-in-out;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .card-footer .price {
+            font-size: 1.3em;
+            color: #e60000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="index-page">
+
+<header th:replace="front/fragments/header :: header"></header>
+
+<main id="main" class="main">
+    <section class="menu-section">
+        <div class="container">
+
+            <div class="text-center mb-5">
+                <h1 class="menu-title display-4">Bizim Menyu</h1>
+                <p class="text-muted">Ən təzə və ləzzətli təamlarımızla tanış olun.</p>
+            </div>
+
+            <div class="row">
+
+                <div th:each="product : ${products}" class="col-lg-4 col-md-6 mb-4">
+                    <div class="card product-card h-100">
+
+                        <img th:src="${product.photoUrl}"
+                             th:alt="${product.name}"
+                             class="card-img-top">
+
+                        <div class="card-body">
+
+                            <h4 class="card-title text-center" th:text="${product.name}">Məhsul Adı</h4>
+
+                            <p class="card-text text-muted" th:text="${product.description}">Məhsulun qısa təsviri...</p>
+
+                        </div>
+                        <div class="card-footer bg-white border-0 text-center">
+
+                            <h5 class="price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')} + ' AZN'">15.00 AZN</h5>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${products.isEmpty()}" class="col-12 text-center py-5">
+                    <h3 class="text-muted">Təəssüf ki, hazırda məhsul yoxdur.</h3>
+                    <p>Zəhmət olmasa Admin Panelindən məhsul əlavə edin.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="front/fragments/footer :: footer"></footer>
+
+</body>
+</html>

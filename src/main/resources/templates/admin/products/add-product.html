@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Yeni Məhsul</title>
+
+    <!-- Bootstrap və digər admin stili linkləri -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 600px;">
+        <h2 class="card-title text-center mb-4 text-primary">Yeni Məhsul Əlavə Et</h2>
+
+        <!-- Uğur/Xəta Mesajları -->
+        <div th:if="${successMessage}" class="alert alert-success text-center" role="alert" th:text="${successMessage}">Uğur mesajı</div>
+        <div th:if="${errorMessage}" class="alert alert-danger text-center" role="alert" th:text="${errorMessage}">Xəta mesajı</div>
+
+        <!-- Forma th:object="${productCreateDto}" DTO-nuza bağlanır -->
+        <form th:action="@{/admin/products/add}"
+              th:object="${productCreateDto}"
+              method="post"
+              enctype="multipart/form-data"
+              class="needs-validation" novalidate>
+
+            <!-- 1. MƏHSUL ADI (name) -->
+            <div class="mb-3">
+                <label for="name" class="form-label">Ad</label>
+                <input type="text"
+                       id="name"
+                       th:field="*{name}"
+                       class="form-control"
+                       th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''"
+                       placeholder="Məhsul adını daxil edin"
+                       required>
+                <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="invalid-feedback">Ad sahəsi tələb olunur.</div>
+            </div>
+
+            <!-- 2. TƏSVİR (description) -->
+            <div class="mb-3">
+                <label for="description" class="form-label">Təsvir</label>
+                <textarea id="description"
+                          th:field="*{description}"
+                          class="form-control"
+                          th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"
+                          rows="3"
+                          placeholder="Məhsul haqqında ətraflı məlumat"
+                          required></textarea>
+                <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="invalid-feedback">Təsvir sahəsi tələb olunur.</div>
+            </div>
+
+            <!-- 3. QİYMƏT (price) -->
+            <div class="mb-3">
+                <label for="price" class="form-label">Qiymət</label>
+                <div class="input-group">
+                    <span class="input-group-text">AZN</span>
+                    <input type="number"
+                           id="price"
+                           th:field="*{price}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('price')} ? 'is-invalid' : ''"
+                           step="0.01"
+                           min="0.01"
+                           placeholder="10.00"
+                           required>
+                    <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="invalid-feedback">Qiymət sahəsi tələb olunur.</div>
+                </div>
+            </div>
+
+            <!-- ƏLAVƏ SAHƏLƏR -->
+            <div class="row">
+                <!-- Brend -->
+                <div class="col-md-6 mb-3">
+                    <label for="brand" class="form-label">Brend</label>
+                    <input type="text"
+                           id="brand"
+                           th:field="*{brand}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('brand')} ? 'is-invalid' : ''"
+                           placeholder="Brend adı">
+                    <div th:if="${#fields.hasErrors('brand')}" th:errors="*{brand}" class="invalid-feedback">Brend sahəsi üçün xəta.</div>
+                </div>
+
+                <!-- KATEQORİYA DÜZƏLİŞİ (SELECT BOX) -->
+                <div class="col-md-6 mb-3">
+                    <label for="category" class="form-label">Kateqoriya</label>
+                    <select id="category"
+                            th:field="*{category}"
+                            class="form-select"
+                            th:classappend="${#fields.hasErrors('category')} ? 'is-invalid' : ''"
+                            required>
+                        <!-- İlk seçim - boş dəyər və disable edilir -->
+                        <option value="" disabled selected>Kateqoriya seçin</option>
+                        <!-- Əsas seçimlər -->
+                        <option value="Kişi">Kişi</option>
+                        <option value="Qadın">Qadın</option>
+                        <option value="Unisex">Unisex</option>
+                    </select>
+                    <div th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="invalid-feedback">Kateqoriya sahəsi tələb olunur.</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Həcm (Volume) -->
+                <div class="col-md-6 mb-3">
+                    <label for="volume" class="form-label">Həcm (ml/q)</label>
+                    <input type="number"
+                           id="volume"
+                           th:field="*{volume}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('volume')} ? 'is-invalid' : ''"
+                           placeholder="Məsələn: 100">
+                    <div th:if="${#fields.hasErrors('volume')}" th:errors="*{volume}" class="invalid-feedback">Həcm sahəsi üçün xəta.</div>
+                </div>
+
+                <!-- Qoxu (Scent) -->
+                <div class="col-md-6 mb-3">
+                    <label for="scent" class="form-label">Qoxu</label>
+                    <input type="text"
+                           id="scent"
+                           th:field="*{scent}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('scent')} ? 'is-invalid' : ''"
+                           placeholder="Məsələn: Gül, meyvə">
+                    <div th:if="${#fields.hasErrors('scent')}" th:errors="*{scent}" class="invalid-feedback">Qoxu sahəsi üçün xəta.</div>
+                </div>
+            </div>
+            <!-- ƏLAVƏ SAHƏLƏRİN SONU -->
+
+
+            <!-- 4. ŞƏKİL FAYLI (image) -->
+            <div class="mb-3">
+                <label for="image" class="form-label">Şəkil Faylı</label>
+                <input type="file"
+                       id="image"
+                       name="image"
+                       class="form-control"
+                       accept="image/*"
+                       required>
+
+                <!-- Şəkil xətası üçün -->
+                <div th:if="${#fields.globalErrors().size() > 0}" class="text-danger mt-1">
+                    <p th:each="error : ${#fields.globalErrors()}"
+                       th:text="${error}">Şəkil yüklənməlidir.</p>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-success btn-lg">Məhsulu Əlavə Et</button>
+            </div>
+        </form>
+
+        <div class="mt-3 text-center">
+            <a th:href="@{/admin/products}" class="btn btn-outline-secondary">Admin Panelə Qayıt</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

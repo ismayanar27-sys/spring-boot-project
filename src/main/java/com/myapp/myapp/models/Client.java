@@ -12,7 +12,6 @@ public class Client {
         private  Long id;
         private String name; // Müştərinin adı.
         private String description; // Müştəri haqqında qısa təsvir.
-        private String photoUrl; // Müştərinin şəklinin URL-i.
         private String information; // Əlavə məlumat.
         @Column(unique = true) // Bu sahədəki dəyərlərin təkrarolunmaz olmasını təmin edir.
         private String email; // Müştərinin elektron poçt ünvanı.

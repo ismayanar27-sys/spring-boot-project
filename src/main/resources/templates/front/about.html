@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Haqqımızda | Yummy. Veb Saytınız</title>
+  <style>
+    .about-section {
+        padding: 80px 0;
+        background-color: #f8f8f8;
+    }
+    .about-content h2 {
+        color: #ffb03c; /* Rənginizi tənzimləyin */
+        font-weight: 700;
+    }
+    .about-image {
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .about-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+  </style>
+</head>
+<body>
+
+<section id="about" class="about-section">
+  <div class="container">
+    <div class="row align-items-center">
+
+      <div class="col-lg-6 about-content">
+        <h2 class="display-5">Bizim Hekayəmiz</h2>
+        <p class="fst-italic">
+          "Yummy." yalnız bir restoran deyil, ləzzət və keyfiyyətin birləşdiyi məkandır.
+        </p>
+        <p>
+          2015-ci ildən bəri biz müştərilərimizə unudulmaz təamlar təqdim etməyə çalışırıq. Məqsədimiz hər bir qonağın süfrəmizdən xoşbəxt ayrılmasıdır.
+        </p>
+        <ul>
+          <li><i class="bi bi-check-circle"></i> Yalnız təzə və yerli məhsullardan istifadə.</li>
+          <li><i class="bi bi-check-circle"></i> Peşəkar aşpazlar komandası.</li>
+          <li><i class="bi bi-check-circle"></i> İstənilən tədbir üçün xüsusi menyu seçimləri.</li>
+        </ul>
+        <p>
+          Bizim üçün keyfiyyət hər şeydən önəmlidir. Buna görə də hər bir ləzzətin hazırlanmasına xüsusi sevgi və qayğı ilə yanaşırıq.
+        </p>
+      </div>
+
+      <div class="col-lg-6 pt-4 pt-lg-0 about-image">
+        <img th:src="@{/assets/img/about-us.jpg}" alt="Haqqımızda şəkil">
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
