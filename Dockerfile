@@ -2,13 +2,14 @@
 FROM maven:3.8.5-openjdk-17 AS build
 WORKDIR /app
 
-# Faylları kopyalayırıq
-COPY pom.xml .
-COPY src ./src
+# Bütün faylları kopyalayırıq
+COPY . .
 
-# ƏSAS DÜZƏLİŞ: -DskipTests əvəzinə -Dmaven.test.skip=true istifadə edirik.
-# Bu, testləri nəinki işə salmır, heç kompilyasiya da etmir (xətanı qarşısını alır).
-RUN mvn clean package -Dmaven.test.skip=true
+# VACİB DÜZƏLİŞ: Maven üçün yaddaş limiti təyin edirik (Render Free Tier üçün)
+ENV MAVEN_OPTS="-Xmx300m"
+
+# Layihəni yığırıq (Testləri atlayırıq)
+RUN mvn clean package -DskipTests -B
 
 # 2. Run mərhələsi
 FROM eclipse-temurin:17-jdk-alpine
