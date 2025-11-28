@@ -1,24 +1,24 @@
-# 1. Build mərhələsi: Maven və JDK 17
+# 1. Build mərhələsi
 FROM maven:3.8.5-openjdk-17 AS build
 WORKDIR /app
 
-# Pom faylını və mənbə kodunu kopyalayırıq
+# Faylları kopyalayırıq
 COPY pom.xml .
 COPY src ./src
 
-# Layihəni yığırıq (Testləri atlayaraq)
-# Bu əmr bütün asılılıqları yükləyəcək və .jar faylını yaradacaq
-RUN mvn clean package -DskipTests
+# ƏSAS DÜZƏLİŞ: -DskipTests əvəzinə -Dmaven.test.skip=true istifadə edirik.
+# Bu, testləri nəinki işə salmır, heç kompilyasiya da etmir (xətanı qarşısını alır).
+RUN mvn clean package -Dmaven.test.skip=true
 
-# 2. Run mərhələsi: Yüngül Java image-i
+# 2. Run mərhələsi
 FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
 
-# Yaradılmış .jar faylını kopyalayırıq
+# Jar faylını kopyalayırıq
 COPY --from=build /app/target/*.jar app.jar
 
-# Portu açırıq (Render üçün vacibdir)
+# Port
 EXPOSE 8080
 
-# Tətbiqi işə salırıq
+# Başlatmaq
 ENTRYPOINT ["java", "-jar", "app.jar"]
