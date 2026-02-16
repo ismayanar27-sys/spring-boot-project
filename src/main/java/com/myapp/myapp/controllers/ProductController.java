@@ -5,6 +5,7 @@ import com.myapp.myapp.dtos.ProductDtos.ProductDto;
 import com.myapp.myapp.dtos.ProductDtos.ProductUpdateDto;
 import com.myapp.myapp.services.ProductService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j; // ELAVE EDILDI: Loglama ucun
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/products")
+@Slf4j // ELAVE EDILDI: Audit ucun loglama aktiv edildi
 public class ProductController {
 
     private final ProductService productService;
@@ -29,6 +31,7 @@ public class ProductController {
     public String getAllProducts(@RequestParam(value = "keyword", required = false) String keyword, Model model) {
         List<ProductDto> products;
         if (keyword != null && !keyword.isEmpty()) {
+            log.info("Mehsul axtarisi edilir: keyword = {}", keyword); // AUDIT LOG
             products = productService.searchProducts(keyword);
             model.addAttribute("keyword", keyword);
         } else {
@@ -45,6 +48,7 @@ public class ProductController {
             model.addAttribute("product", product);
             return "admin/products/product-details";
         } catch (RuntimeException e) {
+            log.error("Mehsul tapilmadi ID: {}", id); // AUDIT LOG
             redirectAttributes.addFlashAttribute("errorMessage", "Xəta: Məhsul ID-si (" + id + ") tapılmadı.");
             return "redirect:/admin/products";
         }
@@ -67,6 +71,7 @@ public class ProductController {
                              RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
+            log.warn("Yeni mehsul elave edilerken validasiya xetasi bas verdi"); // AUDIT LOG
             return "admin/products/add-product";
         }
 
@@ -78,6 +83,7 @@ public class ProductController {
         boolean success = productService.createProducts(productCreateDto, image);
 
         if (success) {
+            log.info("Mehsul ugurla elave edildi: {}", productCreateDto.getName()); // AUDIT LOG
             redirectAttributes.addFlashAttribute("successMessage", "Məhsul uğurla əlavə edildi!");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Məhsul adı artıq mövcuddur və ya daxili xəta baş verdi.");
@@ -97,6 +103,7 @@ public class ProductController {
             }
             return "admin/products/edit-product";
         } catch (RuntimeException e) {
+            log.error("Redakte ucun mehsul tapilmadi ID: {}", id); // AUDIT LOG
             // Məhsul tapılmadıqda
             redirectAttributes.addFlashAttribute("errorMessage", "Redaktə etmək istədiyiniz məhsul tapılmadı.");
             return "redirect:/admin/products";
@@ -113,6 +120,7 @@ public class ProductController {
 
         // 1. DTO validasiya səhvlərini yoxla
         if (bindingResult.hasErrors()) {
+            log.warn("Mehsul yenilenirken validasiya xetasi (ID: {})", id); // AUDIT LOG
             // RedirectAttributes vasitəsilə BindingResult-u və DTO-nu ötürürük.
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.productUpdateDto", bindingResult);
             redirectAttributes.addFlashAttribute("productUpdateDto", productUpdateDto);
@@ -124,6 +132,7 @@ public class ProductController {
         boolean success = productService.updateProducts(productUpdateDto, id, image);
 
         if (success) {
+            log.info("Mehsul yenilendi ID: {}", id); // AUDIT LOG
             redirectAttributes.addFlashAttribute("successMessage", "Məhsul uğurla yeniləndi!");
         } else {
             // Məhsul tapılmadıqda və ya ad təkrarlandıqda
@@ -136,6 +145,7 @@ public class ProductController {
     @PostMapping("/delete/{id}")
     public String deleteProduct(@PathVariable Long id,
                                 RedirectAttributes redirectAttributes) {
+        log.info("Mehsul silinir ID: {}", id); // AUDIT LOG
         boolean success = productService.deleteProducts(id);
         if (success) {
             redirectAttributes.addFlashAttribute("successMessage", "Məhsul uğurla silindi!");

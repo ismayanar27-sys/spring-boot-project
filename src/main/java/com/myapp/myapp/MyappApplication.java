@@ -2,10 +2,10 @@ package com.myapp.myapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan; // ComponentScan import edildi
+import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.myapp.myapp") // Bütün alt paketləri məcburi skan etmək üçün əlavə edildi
+@EnableCaching
 public class MyappApplication {
 
 	public static void main(String[] args) {

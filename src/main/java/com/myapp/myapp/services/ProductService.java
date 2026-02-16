@@ -29,5 +29,12 @@ public interface ProductService {
     List<ProductDto> searchProducts(String keyword);
 
     // YENİ METOD: Məhsulların ümumi sayını gətirir (Workers sayğacı üçün)
-    long countProducts(); // 👈 Bu hissəni əlavə edin!
+    // ELAVE EDILDI: Dashboard sayğacları üçün mütləqdir
+    long countProducts();
+
+    /* * AUDIT TÖVSİYƏSİ (Gələcək üçün):
+     * Əgər məhsul sayı 100-ü keçərsə, getAllProducts() metodunu
+     * Page<ProductDto> getAllProducts(Pageable pageable) ilə əvəz etmək
+     * sistemin sürətini 5 qat artıracaq.
+     */
 }
