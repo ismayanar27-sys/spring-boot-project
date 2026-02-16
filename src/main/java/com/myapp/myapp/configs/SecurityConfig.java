@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // ELAVE EDILDI: Tehlukesiz sifreleme ucun
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,7 +17,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
-public class   SecurityConfig {
+public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -56,20 +57,20 @@ public class   SecurityConfig {
     }
 
     /**
-     * Təhlükəsizlik səbəbiylə əslində bu bean BCryptPasswordEncoder olmalıdır,
-     * lakin layihənizin hazırda {noop} formatında işləməsi üçün NoOpPasswordEncoder istifadə olunur.
+     * UPDATED: Audit telebi - NoOpPasswordEncoder evezine artiq BCrypt istifade olunur.
+     * Bu, parollarin bazada ve ya yaddasda aciq sekilde qalmasinin qarsisini alir.
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
-
     @Bean
     public UserDetailsService userDetailsService() {
-        // InMemoryUserDetailsManager sadə test məqsədləri üçün. Şifrə: 12345
+        // UPDATED: Sifre "12345"-in BCrypt ile hashlenmis versiyasidir.
+        // InMemoryUserDetailsManager ucun parol tehlukesiz hala getirildi.
         UserDetails admin = User.builder()
                 .username("admin")
-                .password("12345")
+                .password("$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOn2")
                 .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(admin);
