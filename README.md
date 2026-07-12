@@ -6,7 +6,7 @@ Restoranlar üçün hazırlanmış tam funksional veb tətbiq — məhsul katalo
 
 ---
 
-## 🚀 Xüsusiyyətlər
+##  Xüsusiyyətlər
 
 - **Məhsul kataloqu** — kateqoriyalara bölünmüş menyu, Cloudinary üzərindən şəkil yükləmə
 - **Onlayn sifariş & səbət** — sessiya-əsaslı səbət idarəetməsi, ödəniş inteqrasiyası
@@ -15,7 +15,7 @@ Restoranlar üçün hazırlanmış tam funksional veb tətbiq — məhsul katalo
 - **Admin paneli** — Spring Security ilə qorunan, məhsul/sifariş idarəetməsi
 - **E-poçt bildirişləri** — Gmail SMTP inteqrasiyası ilə HTML formatlı mail göndərmə
 
-## 🛠️ Texnologiyalar
+##  Texnologiyalar
 
 | Kateqoriya | Texnologiya |
 |---|---|

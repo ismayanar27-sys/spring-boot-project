@@ -3,7 +3,9 @@ package com.myapp.myapp.controllers;
 import com.myapp.myapp.dtos.OrderCreateDto;
 import com.myapp.myapp.dtos.OrderDto;
 import com.myapp.myapp.services.OrderService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,12 +17,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
 
+    private static final String CART_SESSION_KEY = "CURRENT_ORDER_ID";
+
     private final OrderService orderService;
+
+    // application.properties-dən oxunur: portmanat.merchant-id=${PORTMANAT_MERCHANT_ID}
+    @Value("${portmanat.merchant-id:}")
+    private String merchantId;
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderCreateDto orderCreateDto) {
+    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderCreateDto orderCreateDto, HttpSession session) {
         OrderDto createdOrder = orderService.createOrder(orderCreateDto);
+        // Yeni sifariş yaradılanda, ID-ni bu istifadəçinin sessiyasında saxlayırıq.
+        session.setAttribute(CART_SESSION_KEY, createdOrder.getId());
         return ResponseEntity.ok(createdOrder);
     }
 
@@ -39,12 +49,12 @@ public class OrderController {
     }
 
     @GetMapping("/cart")
-    public String viewCart(Model model) {
-        OrderDto order = orderService.getOrderById(1L);
+    public String viewCart(Model model, HttpSession session) {
+        Long currentOrderId = (Long) session.getAttribute(CART_SESSION_KEY);
+        OrderDto order = currentOrderId != null ? orderService.getOrderById(currentOrderId) : null;
         if (order != null) {
             model.addAttribute("order", order);
         } else {
-            // Sifariş tapılmasa, boş səbət səhifəsini göstərir
             model.addAttribute("message", "Səbətinizdə hələ heç bir sifariş yoxdur.");
         }
         return "admin/checkout/cart";
@@ -54,15 +64,15 @@ public class OrderController {
     public String createPayment(@RequestParam("orderId") Long orderId) {
         OrderDto order = orderService.getOrderById(orderId);
         if (order == null) {
-            // Sifariş tapılmasa, xəta səhifəsi əvəzinə səbətə yönləndirir
             return "redirect:/api/orders/cart";
         }
-        // Portmanat ödəniş URL-i
+        // DİQQƏT: Bu, sadəcə demo redirect-dir - real Portmanat inteqrasiyası
+        // adətən imza (signature/hash) və server-to-server callback tələb edir.
         String paymentUrl = "https://www.portmanat.az/az/pay" +
                 "?amount=" + order.getTotalAmount() +
                 "&description=" + "Sifariş #" + orderId +
                 "&transactionId=" + "TXN" + System.currentTimeMillis() +
-                "&merchantId=" + "Sizin_Merchant_ID-niz";
+                "&merchantId=" + merchantId;
         return "redirect:" + paymentUrl;
     }
 }
