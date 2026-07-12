@@ -26,9 +26,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
-    private final EmailService emailService; // Əlavə olundu
+    private final EmailService emailService;
 
-    // Konstruktor yeniləndi: EmailService daxil edildi
     public OrderServiceImpl(OrderRepository orderRepository, ProductRepository productRepository, ModelMapper modelMapper, EmailService emailService) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
@@ -83,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(totalAmount);
         Order savedOrder = orderRepository.save(order);
 
-        // YENİ ƏLAVƏ: Sifariş təsdiq e-poçtunu göndərmək
+        //Sifariş təsdiq e-poçtunu göndərmək
         try {
             String subject = "Sifariş Təsdiqi! #" + savedOrder.getId();
             String body = String.format(

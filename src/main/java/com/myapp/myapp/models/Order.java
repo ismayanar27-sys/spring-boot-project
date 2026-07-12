@@ -15,7 +15,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Müştəri məlumatlarını birbaşa burada saxlayırıq
+    // Customer contact information for this order
     @Column(nullable = false)
     private String customerName;
 
@@ -35,7 +35,7 @@ public class Order {
     private LocalDateTime orderDate;
 
     @Column(nullable = false)
-    private String paymentMethod; // Buraya bu sətri əlavə edin
+    private String paymentMethod;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();

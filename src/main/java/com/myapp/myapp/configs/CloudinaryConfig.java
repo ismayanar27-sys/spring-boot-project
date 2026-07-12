@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration // Spring Framework'ə bu sinfin konfiqurasiya sinfi olduğunu bildirir.
+@Configuration
 public class CloudinaryConfig {
     // application.properties faylında qeyd olunan Cloudinary hesabının adını bu dəyişənə verir.
     @Value("${cloudinary.cloud-name}")

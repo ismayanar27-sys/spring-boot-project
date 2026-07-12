@@ -19,7 +19,7 @@ public class ContactServiceImpl implements ContactService {
 
     private final ContactRepository contactRepository;
     private final EmailService emailService;
-    private final ModelMapper modelMapper; // DTO-dan Entity-ə çevirmək üçün
+    private final ModelMapper modelMapper; //DTO-dan Entity-ə çevirmək üçün
 
     // application.properties faylından admin mail ünvanını oxuyuruq
     @Value("${admin.email.recipient:ismayanar27@gmail.com}")

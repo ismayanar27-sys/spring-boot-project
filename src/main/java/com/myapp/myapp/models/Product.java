@@ -12,17 +12,15 @@ public class Product {
         private Long id;
 
         @Column(unique = true)
-        private String name; // Ətrin adı
+        private String name;
 
-        private String description; // Ətrin təsviri
-        private Double price; // Qiyməti
-        private String photoUrl; // Şəkil URL-i
+        private String description;
+        private Double price;
+        private String photoUrl;
 
-        // Yeni əlavə olunan sahələr
-        private String brand; // Ətrin brendi (məsələn, Dior, Chanel)
-        private Integer volume; // Həcmi (məsələn, 50, 100 ml)
-        private String scent; // Qoxusu/Tərkibi (məsələn, çiçəkli, şirin)
+        private String brand;
+        private Integer volume;
+        private String scent;
 
-        // Əlavə olunan Kateqoriya sahəsi
         private String category;
 }

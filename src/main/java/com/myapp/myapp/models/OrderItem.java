@@ -12,17 +12,21 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    // Ordered product  - LAZY loading for performance
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    private Product product; // Sifariş edilən məhsul
+    private Product product;
 
+    // Quantity
     @Column(nullable = false)
-    private Integer quantity; // Miqdarı
+    private Integer quantity;
 
+    // Price at the time of order
     @Column(nullable = false)
-    private Double price; // Sifariş olunan zaman məhsulun qiyməti
+    private Double price;
 
-    @ManyToOne
+    // Parent order  - LAZY loading
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    private Order order; // Bu maddənin aid olduğu sifariş
+    private Order order;
 }

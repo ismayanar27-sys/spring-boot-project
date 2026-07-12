@@ -26,9 +26,9 @@ public interface ClientService {
     // ID-yə görə müştərini tapır və ClientUpDateDto obyektini qaytarır.
     ClientUpDateDto findClientById(Long id);
 
-    // Yeni axtarış metodu.
+    //axtarış metodu
     List<ClientDto> searchClients(String keyword);
 
-    // YENİ METOD: Müştərilərin ümumi sayını gətirir
+    // Müştərilərin ümumi sayını gətirir
     long countClients(); // 👈 Bu hissəni əlavə edin!
 }

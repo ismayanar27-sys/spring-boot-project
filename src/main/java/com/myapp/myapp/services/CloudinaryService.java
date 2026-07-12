@@ -26,7 +26,6 @@ public class CloudinaryService {
         }
     }
 
-    // Bu metodu əlavə etməlisiniz!
     public void deleteImage(String photoUrl) {
         if (photoUrl != null && !photoUrl.isEmpty()) {
             try {

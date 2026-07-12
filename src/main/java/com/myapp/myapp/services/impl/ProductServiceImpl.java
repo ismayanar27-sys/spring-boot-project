@@ -9,8 +9,8 @@ import com.myapp.myapp.services.CloudinaryService;
 import com.myapp.myapp.services.ProductService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.CacheEvict; // ELAVE EDILDI
-import org.springframework.cache.annotation.Cacheable; // ELAVE EDILDI
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = "products") // ELAVE EDILDI: Bazadan melumati bir defe oxuyub RAM-da saxlayacaq
+    @Cacheable(value = "products") //Bazadan melumati bir defe oxuyub RAM-da saxlayacaq
     public List<ProductDto> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream().map(x -> modelMapper.map(x, ProductDto.class)).toList();
@@ -90,7 +90,7 @@ public class ProductServiceImpl implements ProductService {
     public boolean updateProducts(ProductUpdateDto productUpdateDto, Long id, MultipartFile image) {
         Optional<Product> optionalProduct = productRepository.findById(id);
 
-        // Düzəliş: Məhsul tapılmadıqda false qaytarılır
+        //Məhsul tapılmadıqda false qaytarılır
         if (optionalProduct.isEmpty()) {
             return false;
         }
@@ -111,7 +111,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (image != null && !image.isEmpty()) {
             try {
-                // Köhnə şəkli sil (Əvvəlki kodunuzdakı məntiq)
+                // Köhnə şəkli sil
                 if (product.getPhotoUrl() != null && !product.getPhotoUrl().isEmpty()) {
                     cloudinaryService.deleteImage(product.getPhotoUrl());
                 }
@@ -132,11 +132,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "products", allEntries = true) // ELAVE EDILDI: Mehsul silinende siyahini yenileyir
+    @CacheEvict(value = "products", allEntries = true) //Mehsul silinende siyahini yenileyir
     public boolean deleteProducts(Long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
 
-        // Düzəliş: Məhsul tapılmadıqda false qaytarılır
         if (optionalProduct.isEmpty()) {
             return false;
         }

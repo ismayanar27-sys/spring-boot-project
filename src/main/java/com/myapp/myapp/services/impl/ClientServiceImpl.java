@@ -68,7 +68,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public boolean deleteClients(Long id) {
-        // DÜZƏLİŞ: Silməzdən əvvəl ID-nin mövcudluğunu yoxlayırıq.
+        //Silməzdən əvvəl ID-nin mövcudluğunu yoxlayırıq.
         if (clientRepository.existsById(id)) {
             clientRepository.deleteById(id);
             return true; // Uğurlu silinmə
@@ -83,7 +83,7 @@ public class ClientServiceImpl implements ClientService {
         return modelMapper.map(client, ClientUpDateDto.class);
     }
 
-    // Yeni əlavə etdiyimiz axtarış metodu.
+    //Axtarış metodu.
     @Override
     public List<ClientDto> searchClients(String keyword) {
         // Boşluqları silir və axtarış sözünü kiçik hərflərə çevirir ki, axtarış düzgün işləsin.
@@ -101,7 +101,7 @@ public class ClientServiceImpl implements ClientService {
         return clientDtos;
     }
 
-    // YENİ METOD: Müştərilərin ümumi sayını gətirir (Dynamic Clients Counter üçün)
+    //Müştərilərin ümumi sayını gətirir (Dynamic Clients Counter üçün)
     @Override
     public long countClients() {
         // ClientRepository interfeysində avtomatik olaraq təmin olunan count() metodunu çağırır.

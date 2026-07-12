@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // ELAVE EDILDI: Tehlukesiz sifreleme ucun
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; //Tehlukesiz sifreleme ucun
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,7 +22,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // KRİTİK DÜZƏLİŞ 1: Session xətasını aradan qaldırır və Front-end POST formalarını idarə edir.
+                //1: Session xətasını aradan qaldırır və Front-end POST formalarını idarə edir.
                 .csrf(csrf -> csrf
                         // Front-end formalarının CSRF qorumasını bağlayır:
                         // /contact və /book-a-table formaları POST sorğusu ilə işlədiyi üçün mütləq ignore edilməlidir.
@@ -32,15 +32,15 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        // KRİTİK DÜZƏLİŞ 2: Bu iki formanın hər kəs tərəfindən istifadə edilməsinə icazə verir.
+                        //2 Bu iki formanın hər kəs tərəfindən istifadə edilməsinə icazə verir.
                         // Sifariş Et (book-a-table) və Əlaqə (contact) POST sorğuları
                         .requestMatchers(HttpMethod.POST, "/contact").permitAll()
                         .requestMatchers(HttpMethod.POST, "/book-a-table").permitAll()
 
-                        // Qayda 3: Admin ilə başlayan hər şeyə yalnız daxil olan istifadəçilər baxa bilər
+                        // Qayda 3 Admin ilə başlayan hər şeyə yalnız daxil olan istifadəçilər baxa bilər
                         .requestMatchers("/admin/**").authenticated()
 
-                        // Qayda 4: Bütün digər yollara (frontend səhifələri, CSS/JS/şəkillər) icazə ver
+                        // Qayda 4 Bütün digər yollara (frontend səhifələri, CSS/JS/şəkillər) icazə ver
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
@@ -57,7 +57,7 @@ public class SecurityConfig {
     }
 
     /**
-     * UPDATED: Audit telebi - NoOpPasswordEncoder evezine artiq BCrypt istifade olunur.
+     * UPDATED: Audit telebi - NoOpPasswordEncoder evezine BCrypt istifade olunur.
      * Bu, parollarin bazada ve ya yaddasda aciq sekilde qalmasinin qarsisini alir.
      */
     @Bean
@@ -70,7 +70,7 @@ public class SecurityConfig {
         // InMemoryUserDetailsManager ucun parol tehlukesiz hala getirildi.
         UserDetails admin = User.builder()
                 .username("admin")
-                .password("$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOn2")
+                .password("$2b$10$2koYND9BQvZlXrzUempCyO4BqOcCzBCU0wgRJYAVmSzBA/lZV5oYq")
                 .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(admin);

@@ -34,7 +34,6 @@ public class Reservation {
     }
 
     // Məlumatları qəbul edən Konstruktor
-    // DÜZƏLİŞ: int əvəzinə Integer istifadə edildi
     public Reservation(String name, String phone, String email, String reservationDate, String reservationTime, Integer people, String message) {
         this.name = name;
         this.phone = phone;
@@ -45,7 +44,6 @@ public class Reservation {
         this.message = message;
     }
 
-    // Getter və Setterlər
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
@@ -59,7 +57,6 @@ public class Reservation {
     public String getReservationTime() { return reservationTime; }
     public void setReservationTime(String reservationTime) { this.reservationTime = reservationTime; }
 
-    // DÜZƏLİŞ: int əvəzinə Integer istifadə edildi
     public Integer getPeople() { return people; }
     public void setPeople(Integer people) { this.people = people; }
 
