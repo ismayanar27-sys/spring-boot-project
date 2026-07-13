@@ -3,6 +3,7 @@ package com.myapp.myapp.controllers;
 import com.myapp.myapp.dtos.ReservationDTO;
 import com.myapp.myapp.models.Reservation;
 import com.myapp.myapp.services.ReservationService;
+import lombok.extern.slf4j.Slf4j; // ELAVE EDILDI: Loglama ucun
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody; // Mətn (String) c
 import jakarta.validation.Valid;
 
 @Controller
+@Slf4j // ELAVE EDILDI: Audit ucun loglama aktiv edildi
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -36,7 +38,7 @@ public class ReservationController {
     ) {
         // 1. Validasiya Xətalarının Yoxlanılması
         if (bindingResult.hasErrors()) {
-            System.err.println("❌ Rezervasiya formunda doğrulama xətası aşkar edildi.");
+            log.warn("❌ Rezervasiya formunda doğrulama xətası aşkar edildi."); // DƏYİŞDİ: System.err -> log.warn
 
             // Xəta mesajını Frontend'in başa düşəcəyi String formatında qaytarırıq
             return "ERROR: Zəhmət olmasa, formadakı səhvləri düzəldin və yenidən cəhd edin.";
@@ -55,8 +57,7 @@ public class ReservationController {
 
         } catch (Exception e) {
             // 5. Server xətası baş verərsə
-            System.err.println("❌ Rezervasiya emalı zamanı gözlənilməyən server xətası: " + e.getMessage());
-            e.printStackTrace();
+            log.error("❌ Rezervasiya emalı zamanı gözlənilməyən server xətası: " + e.getMessage(), e); // DƏYİŞDİ: System.err + printStackTrace -> log.error
             return "ERROR: Serverdə gözlənilməyən xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.";
         }
     }

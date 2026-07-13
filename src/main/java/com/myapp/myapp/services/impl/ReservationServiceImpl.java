@@ -4,12 +4,14 @@ import com.myapp.myapp.models.Reservation;
 import com.myapp.myapp.repositories.ReservationRepository;
 import com.myapp.myapp.services.EmailService;
 import com.myapp.myapp.services.ReservationService;
+import lombok.extern.slf4j.Slf4j; //  Loglama ucun
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 // BU Spring Service komponentidir
 @Service
+@Slf4j // Audit ucun loglama aktiv edildi
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -53,7 +55,7 @@ public class ReservationServiceImpl implements ReservationService {
             emailService.sendEmail(adminEmailRecipient, subject, body);
         } catch (Exception e) {
             // Mail göndərilməsində xəta olsa da, rezervasiya artıq bazaya yazılıb - bu, prosesi dayandırmır.
-            System.err.println("XƏTA: Adminə rezervasiya maili göndərilərkən xəta: " + e.getMessage());
+            log.error("Adminə rezervasiya maili göndərilərkən xəta baş verdi", e); // DƏYİŞDİ: System.err -> log.error
         }
     }
 

@@ -8,6 +8,7 @@ import com.myapp.myapp.repositories.ProductRepository;
 import com.myapp.myapp.services.CloudinaryService;
 import com.myapp.myapp.services.ProductService;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j; // ELAVE EDILDI: Loglama ucun
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j // ELAVE EDILDI: Audit ucun loglama aktiv edildi
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
@@ -70,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
             productRepository.save(product);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Mehsul elave edilerken xeta bas verdi: {}", productCreateDto.getName(), e); // DƏYİŞDİ: e.printStackTrace() -> log.error
             return false;
         }
     }
@@ -120,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
                 String photoUrl = cloudinaryService.uploadImage(image);
                 product.setPhotoUrl(photoUrl);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Mehsul sekli yenilenerken xeta bas verdi, ID: {}", id, e); // DƏYİŞDİ: e.printStackTrace() -> log.error
                 // Şəkil yükləmədə problem varsa
                 return false;
             }
@@ -147,7 +149,7 @@ public class ProductServiceImpl implements ProductService {
             productRepository.deleteById(id);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Mehsul silinerken xeta bas verdi, ID: {}", id, e); // DƏYİŞDİ: e.printStackTrace() -> log.error
             return false;
         }
     }

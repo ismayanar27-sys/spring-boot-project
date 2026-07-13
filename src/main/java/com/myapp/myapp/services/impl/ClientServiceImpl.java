@@ -35,8 +35,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ClientDto getClientsId(Long id) {
-        // ID-yə görə müştərini tapır. Tapmasa xəta atır.
-        Client client = clientRepository.findById(id).orElseThrow();
+        // ID-yə görə müştərini tapır. Tapmasa mənalı mesajla xəta atır. (ELAVE EDILDI: mesaj)
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Müştəri tapılmadı, ID: " + id));
         // Tapılan Client obyektini ClientDto obyektinə çevirir.
         return modelMapper.map(client, ClientDto.class);
     }
@@ -78,8 +79,9 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ClientUpDateDto findClientById(Long id) {
-        // ID-yə görə müştərini tapır və yeniləmə forması üçün DTO-ya çevirir.
-        Client client = clientRepository.findById(id).orElseThrow();
+        // ID-yə görə müştərini tapır və yeniləmə forması üçün DTO-ya çevirir. (ELAVE EDILDI: mesaj)
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Müştəri tapılmadı, ID: " + id));
         return modelMapper.map(client, ClientUpDateDto.class);
     }
 
