@@ -66,8 +66,7 @@ public class SecurityConfig {
     }
     @Bean
     public UserDetailsService userDetailsService() {
-        // UPDATED: Sifre "12345"-in BCrypt ile hashlenmis versiyasidir.
-        // InMemoryUserDetailsManager ucun parol tehlukesiz hala getirildi.
+        // InMemoryUserDetailsManager ucun parol tehlukesiz haldadir
         UserDetails admin = User.builder()
                 .username("admin")
                 .password("$2b$10$2koYND9BQvZlXrzUempCyO4BqOcCzBCU0wgRJYAVmSzBA/lZV5oYq")
