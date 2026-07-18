@@ -1,6 +1,7 @@
 package com.myapp.myapp.dtos;
 
 import lombok.Data;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class OrderDto {
     private String customerName;
     private String customerEmail;
     private String customerPhone;
-    private Double totalAmount;
+    private BigDecimal totalAmount; //Double -> BigDecimal (pul üçün dəqiq hesablama)
     private String status;
     private LocalDateTime orderDate;
     private List<OrderItemDto> orderItems;

@@ -13,13 +13,13 @@ public class HomeController {
 
     private final ClientService clientService;
     private final ReservationService reservationService;
-    private final ProductService productService; // ✅ ProductService dəyişən kimi əlavə edildi
+    private final ProductService productService;
 
     // Constructor Injection: Spring bütün lazımi Service obyektlərini avtomatik ötürür.
     public HomeController(ClientService clientService, ReservationService reservationService, ProductService productService) {
         this.clientService = clientService;
         this.reservationService = reservationService;
-        this.productService = productService; // ✅ ProductService mənimsədildi
+        this.productService = productService;
     }
 
     // Ana səhifəni yükləyir. URL: /, /index
@@ -36,7 +36,7 @@ public class HomeController {
         long projectCount = reservationService.countReservations();
         model.addAttribute("projectCount", projectCount); // HTML-də 'projectCount' adı ilə istifadə olunur.
 
-        // 3. Products Sayı: Ətir Mağazası üçün ümumi məhsul sayını gətirir.
+        // 3. Products Sayı: ümumi məhsul sayını gətirir.
         long workerCount = productService.countProducts();
         model.addAttribute("workerCount", workerCount); // HTML-də 'workerCount' adı ilə istifadə olunur.
 

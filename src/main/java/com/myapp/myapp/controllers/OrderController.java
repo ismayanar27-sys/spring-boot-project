@@ -29,7 +29,7 @@ public class OrderController {
     @ResponseBody
     public ResponseEntity<OrderDto> createOrder(@RequestBody OrderCreateDto orderCreateDto, HttpSession session) {
         OrderDto createdOrder = orderService.createOrder(orderCreateDto);
-        // Yeni sifariş yaradılanda, ID-ni bu istifadəçinin sessiyasında saxlayırıq.
+        // Yeni sifariş yaradılanda, ID-ni bu istifadəçinin sessiyasında saxlayır.
         session.setAttribute(CART_SESSION_KEY, createdOrder.getId());
         return ResponseEntity.ok(createdOrder);
     }
@@ -66,8 +66,8 @@ public class OrderController {
         if (order == null) {
             return "redirect:/api/orders/cart";
         }
-        // DİQQƏT: Bu, sadəcə demo redirect-dir - real Portmanat inteqrasiyası
-        // adətən imza (signature/hash) və server-to-server callback tələb edir.
+        // Bu, sadəcə demo redirect-dir - real Portmanat inteqrasiyası
+        // (signature/hash) və server-to-server callback tələb edir.
         String paymentUrl = "https://www.portmanat.az/az/pay" +
                 "?amount=" + order.getTotalAmount() +
                 "&description=" + "Sifariş #" + orderId +

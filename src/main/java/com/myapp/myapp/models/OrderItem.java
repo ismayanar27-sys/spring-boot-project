@@ -3,6 +3,8 @@ package com.myapp.myapp.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "order_items")
 @Data
@@ -23,7 +25,7 @@ public class OrderItem {
 
     // Price at the time of order
     @Column(nullable = false)
-    private Double price;
+    private BigDecimal price;
 
     // Parent order  - LAZY loading
     @ManyToOne(fetch = FetchType.LAZY)

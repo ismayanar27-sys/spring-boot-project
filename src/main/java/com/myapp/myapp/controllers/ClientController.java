@@ -4,6 +4,7 @@ import com.myapp.myapp.dtos.ClientDtos.ClientCreateDto;
 import com.myapp.myapp.dtos.ClientDtos.ClientDto;
 import com.myapp.myapp.dtos.ClientDtos.ClientUpDateDto;
 import com.myapp.myapp.services.ClientService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/clients")
+@Slf4j
 public class ClientController {
 
     private final ClientService clientService;
@@ -39,10 +41,18 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    public String getClientById(@PathVariable Long id, Model model) {
-        ClientDto client = clientService.getClientsId(id);
-        model.addAttribute("client", client);
-        return "admin/clients/client-details";
+    public String getClientById(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        // try-catch - musteri tapilmasa cirkin 500 sehifesi evezine
+        // rahat mesajla siyahiya geri qaytarir
+        try {
+            ClientDto client = clientService.getClientsId(id);
+            model.addAttribute("client", client);
+            return "admin/clients/client-details";
+        } catch (RuntimeException e) {
+            log.error("Musteri tapilmadi ID: {}", id);
+            redirectAttributes.addFlashAttribute("errorMessage", "Xəta: Müştəri ID-si (" + id + ") tapılmadı.");
+            return "redirect:/admin/clients";
+        }
     }
 
     @GetMapping("/add")
@@ -60,26 +70,45 @@ public class ClientController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editClientForm(@PathVariable Long id, Model model) {
-        ClientUpDateDto clientUpDateDto = clientService.findClientById(id);
-        model.addAttribute("clientUpDateDto", clientUpDateDto);
-        return "admin/clients/client-update";
+    public String editClientForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        //try-catch - eyni menteqle
+        try {
+            ClientUpDateDto clientUpDateDto = clientService.findClientById(id);
+            model.addAttribute("clientUpDateDto", clientUpDateDto);
+            return "admin/clients/client-update";
+        } catch (RuntimeException e) {
+            log.error("Redakte ucun musteri tapilmadi ID: {}", id);
+            redirectAttributes.addFlashAttribute("errorMessage", "Redaktə etmək istədiyiniz müştəri tapılmadı.");
+            return "redirect:/admin/clients";
+        }
     }
 
     @PostMapping("/update/{id}")
     public String updateClient(@PathVariable Long id,
                                @ModelAttribute ClientUpDateDto clientUpDateDto,
                                RedirectAttributes redirectAttributes) {
-        clientService.updateClients(clientUpDateDto, id);
-        redirectAttributes.addFlashAttribute("successMessage", "Müştəri uğurla yeniləndi!");
+        //true/false nəticəsi yoxlanılır - əvvəl "uğurlu" yazılırdı, müştəri tapılmasa belə
+        boolean updated = clientService.updateClients(clientUpDateDto, id);
+        if (updated) {
+            redirectAttributes.addFlashAttribute("successMessage", "Müştəri uğurla yeniləndi!");
+        } else {
+            log.warn("Musteri yenilenmedi, tapilmadi ID: {}", id);
+            redirectAttributes.addFlashAttribute("errorMessage", "Yeniləmə uğursuz oldu: müştəri tapılmadı.");
+        }
         return "redirect:/admin/clients";
     }
 
     @PostMapping("/delete/{id}")
     public String deleteClient(@PathVariable Long id,
                                RedirectAttributes redirectAttributes) {
-        clientService.deleteClients(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Müştəri uğurla silindi!");
+        //eyni məntiqlə boolean yoxlanılır
+        boolean deleted = clientService.deleteClients(id);
+        if (deleted) {
+            redirectAttributes.addFlashAttribute("successMessage", "Müştəri uğurla silindi!");
+        } else {
+            log.warn("Musteri silinmedi, tapilmadi ID: {}", id);
+            redirectAttributes.addFlashAttribute("errorMessage", "Silinmə uğursuz oldu: müştəri tapılmadı.");
+        }
         return "redirect:/admin/clients";
     }
 }

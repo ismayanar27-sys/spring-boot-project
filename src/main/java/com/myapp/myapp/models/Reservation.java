@@ -23,7 +23,7 @@ public class Reservation {
     private String email;
     private String reservationDate;
     private String reservationTime;
-    private Integer people; // DÜZƏLİŞ: int əvəzinə Integer istifadə edildi
+    private Integer people;
     private String message;
 
     // Sifarişin bazaya yazılma vaxtı

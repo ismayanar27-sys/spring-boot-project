@@ -3,7 +3,7 @@ package com.myapp.myapp.controllers;
 import com.myapp.myapp.dtos.ReservationDTO;
 import com.myapp.myapp.models.Reservation;
 import com.myapp.myapp.services.ReservationService;
-import lombok.extern.slf4j.Slf4j; // ELAVE EDILDI: Loglama ucun
+import lombok.extern.slf4j.Slf4j; //  Loglama ucun
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody; // Mətn (String) c
 import jakarta.validation.Valid;
 
 @Controller
-@Slf4j // ELAVE EDILDI: Audit ucun loglama aktiv edildi
+@Slf4j // Audit ucun loglama aktiv edildi
 public class ReservationController {
 
     private final ReservationService reservationService;
@@ -38,7 +38,7 @@ public class ReservationController {
     ) {
         // 1. Validasiya Xətalarının Yoxlanılması
         if (bindingResult.hasErrors()) {
-            log.warn("❌ Rezervasiya formunda doğrulama xətası aşkar edildi."); // DƏYİŞDİ: System.err -> log.warn
+            log.warn("❌ Rezervasiya formunda doğrulama xətası aşkar edildi."); //DAHA YENIDIR: System.err -> log.warn
 
             // Xəta mesajını Frontend'in başa düşəcəyi String formatında qaytarırıq
             return "ERROR: Zəhmət olmasa, formadakı səhvləri düzəldin və yenidən cəhd edin.";

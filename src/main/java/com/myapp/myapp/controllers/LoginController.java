@@ -13,7 +13,7 @@ public class LoginController {
      */
     @GetMapping("/login")
     public String login() {
-        // Bu, templates/front/login.html faylını göstərməyi təmin edir.
+        // Bu, templates/front/login.html faylını göstərir
         return "front/login";
     }
 }

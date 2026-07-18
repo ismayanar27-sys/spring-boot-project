@@ -2,6 +2,8 @@ package com.myapp.myapp.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ public class Order {
     private String customerPhone;
 
     @Column(nullable = false)
-    private Double totalAmount;
+    private BigDecimal totalAmount;
 
     @Column(nullable = false)
     private String status;

@@ -3,6 +3,8 @@ package com.myapp.myapp.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name="products")
 @Data
@@ -15,7 +17,7 @@ public class Product {
         private String name;
 
         private String description;
-        private Double price;
+        private BigDecimal price;
         private String photoUrl;
 
         private String brand;

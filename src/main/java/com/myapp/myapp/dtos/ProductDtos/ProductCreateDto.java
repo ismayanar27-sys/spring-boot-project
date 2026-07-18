@@ -8,11 +8,13 @@ import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class ProductCreateDto {
 
     // Validasiyalar DTO-ya əlavə edildi
-    @NotBlank(message = "Ətir adı boş qala bilməz.")
+    @NotBlank(message = "Məhsul adı boş qala bilməz.")
     @Size(min = 3, max = 100, message = "Ad 3-100 simvol olmalıdır.")
     private String name;
 
@@ -22,7 +24,7 @@ public class ProductCreateDto {
 
     @NotNull(message = "Qiymət daxil edilməlidir.")
     @DecimalMin(value = "0.01", message = "Qiymət 0.01-dən çox olmalıdır.")
-    private Double price;
+    private BigDecimal price;
 
     @NotBlank(message = "Brend adı boş qala bilməz.")
     private String brand;

@@ -17,7 +17,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/products")
-@Slf4j // ELAVE EDILDI: Audit ucun loglama aktiv edildi
+@Slf4j //Audit ucun loglama
 public class ProductController {
 
     private final ProductService productService;
