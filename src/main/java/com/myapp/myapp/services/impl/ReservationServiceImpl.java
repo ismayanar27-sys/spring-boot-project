@@ -4,46 +4,60 @@ import com.myapp.myapp.models.Reservation;
 import com.myapp.myapp.repositories.ReservationRepository;
 import com.myapp.myapp.services.EmailService;
 import com.myapp.myapp.services.ReservationService;
-import lombok.extern.slf4j.Slf4j; //  Loglama ucun
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-// BU Spring Service komponentidir
 @Service
-@Slf4j // Audit ucun loglama aktiv edildi
+@Slf4j
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final EmailService emailService;
 
-    // application.properties faylından admin mail ünvanını oxuyuruq (ContactServiceImpl ilə eyni məntiq)
+    // application.properties faylından adminin e-poçt ünvanını oxuyur
     @Value("${admin.email.recipient:ismayanar27@gmail.com}")
     private String adminEmailRecipient;
 
-    // Dependensiyaların İnjektə Edilməsi (Repository-ni istifadə etmək üçün)
-    @Autowired
-    public ReservationServiceImpl(ReservationRepository reservationRepository, EmailService emailService) {
+    // Konstruktor vasitəsilə asılılıqların inyeksiyası
+    public ReservationServiceImpl(
+            ReservationRepository reservationRepository,
+            EmailService emailService
+    ) {
         this.reservationRepository = reservationRepository;
         this.emailService = emailService;
     }
 
-    // İnterfeysdən gələn metodu həyata keçiririk (void olaraq dəyişdirildi)
     @Override
+    @Transactional
     public void saveReservation(Reservation reservation) {
-        // Repository-nin save metodunu çağıraraq məlumatı bazaya yazırıq.
-        Reservation saved = reservationRepository.save(reservation);
-        // Bazaya yazıldıqdan sonra adminə bildiriş maili göndəririk (Contact formu ilə eyni məntiq)
-        sendAdminNotification(saved);
+
+        // Rezervasiyanı bazaya yazırıq
+        Reservation savedReservation =
+                reservationRepository.save(reservation);
+
+        // Rezervasiya bazaya yazıldıqdan sonra adminə bildiriş göndəririk
+        sendAdminNotification(savedReservation);
     }
 
     private void sendAdminNotification(Reservation reservation) {
+
         try {
-            final String subject = "YENİ REZERVASİYA: " + reservation.getName();
+            final String subject =
+                    "Yeni rezervasiya: " + reservation.getName();
+
             final String body = String.format(
-                    "<b>Ad:</b> %s<br><b>Telefon:</b> %s<br><b>Email:</b> %s<br>" +
-                            "<b>Tarix:</b> %s<br><b>Saat:</b> %s<br><b>Nəfər sayı:</b> %s<br>" +
+                    "<b>Ad:</b> %s<br>" +
+                            "<b>Telefon:</b> %s<br>" +
+                            "<b>E-poçt:</b> %s<br>" +
+                            "<b>Tarix:</b> %s<br>" +
+                            "<b>Saat:</b> %s<br>" +
+                            "<b>Nəfər sayı:</b> %s<br>" +
                             "<h3>Qeyd:</h3>%s",
+
                     reservation.getName(),
                     reservation.getPhone(),
                     reservation.getEmail(),
@@ -52,20 +66,30 @@ public class ReservationServiceImpl implements ReservationService {
                     reservation.getPeople(),
                     reservation.getMessage()
             );
-            emailService.sendEmail(adminEmailRecipient, subject, body);
+
+            emailService.sendEmail(
+                    adminEmailRecipient,
+                    subject,
+                    body
+            );
+
         } catch (Exception e) {
-            // Mail göndərilməsində xəta olsa da, rezervasiya artıq bazaya yazılıb - bu, prosesi dayandırmır.
-            log.error("Adminə rezervasiya maili göndərilərkən xəta baş verdi", e); // DƏYİŞDİ: System.err -> log.error
+
+            // E-poçt göndərilməsə belə, rezervasiya bazada qalır
+            log.error(
+                    "Adminə rezervasiya e-poçtu göndərilərkən xəta baş verdi",
+                    e
+            );
         }
     }
 
     /**
-     * Projects sayğacını dinamikləşdirmək üçün verilənlər bazasındakı
-     * bütün rezervasiyaların (Reservation) sayını qaytarır.
+     * Bazadakı bütün rezervasiyaların sayını qaytarır.
      */
     @Override
+    @Transactional(readOnly = true)
     public long countReservations() {
-        // ReservationRepository interfeysində avtomatik olaraq təmin olunan count() metodunu çağırır.
         return reservationRepository.count();
     }
+
 }

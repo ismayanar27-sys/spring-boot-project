@@ -1,18 +1,24 @@
 package com.myapp.myapp.models;
 
 /**
- * Sifarişin mümkün statusları. Bunun məqsədi - updateOrderStatus() metoduna
- * istənilən sərbəst mətnin (məsələn "SALAM") yazılmasının qarşısını almaqdır.
- * Yalnız bu enum-da təyin olunan dəyərlər qəbul edilir.
+
+ Sifarişin mümkün statuslarını müəyyən edir.
+
+
+ Bu enum sərbəst mətnlə status göndərilməsinin qarşısını alır.
+
+ Yalnız burada təyin olunmuş statuslar qəbul edilir.
  */
 public enum OrderStatus {
+
     PENDING("Hazırlanır"),
     PAID("Ödənildi"),
     FAILED("Uğursuz"),
     DELIVERED("Göndərildi"),
     CANCELLED("Ləğv edildi");
 
-    private final String label; // Azərbaycanca göstərilən ad (frontend-də görünən mətn)
+    // Frontend-də göstərilən Azərbaycan dilində status adı
+    private final String label;
 
     OrderStatus(String label) {
         this.label = label;
@@ -23,16 +29,29 @@ public enum OrderStatus {
     }
 
     /**
-     * Admin panelinin HTML formu (order-details.html) status dəyərini
-     * enum adı ("PENDING") yox, birbaşa Azərbaycanca mətn ("Hazırlanır") kimi göndərir.
-     * Bu metod, mətndən uyğun enum-u tapır. Tapmasa null qaytarır.
+
+     Azərbaycan dilindəki status adına uyğun enum dəyərini tapır.
+
+
+     Məsələn:
+     "Hazırlanır" -> PENDING
+
+
+
+     Uyğun status tapılmadıqda null qaytarır.
      */
     public static OrderStatus fromLabel(String label) {
-        for (OrderStatus s : values()) {
-            if (s.label.equalsIgnoreCase(label)) {
-                return s;
+
+        if (label == null || label.isBlank()) {
+            return null;
+        }
+
+        for (OrderStatus status : values()) {
+            if (status.label.equalsIgnoreCase(label.trim())) {
+                return status;
             }
         }
+
         return null;
     }
 }

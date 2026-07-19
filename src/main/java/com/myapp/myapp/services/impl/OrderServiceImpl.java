@@ -9,17 +9,19 @@ import com.myapp.myapp.models.OrderStatus;
 import com.myapp.myapp.models.Product;
 import com.myapp.myapp.repositories.OrderRepository;
 import com.myapp.myapp.repositories.ProductRepository;
-import com.myapp.myapp.services.EmailService; // Əlavə olundu
+import com.myapp.myapp.services.EmailService;
 import com.myapp.myapp.services.OrderService;
+
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.modelmapper.ModelMapper;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,121 +34,201 @@ public class OrderServiceImpl implements OrderService {
     private final ModelMapper modelMapper;
     private final EmailService emailService;
 
-    // Konstruktor yeniləndi: EmailService daxil edildi
-    public OrderServiceImpl(OrderRepository orderRepository, ProductRepository productRepository, ModelMapper modelMapper, EmailService emailService) {
+    public OrderServiceImpl(
+            OrderRepository orderRepository,
+            ProductRepository productRepository,
+            ModelMapper modelMapper,
+            EmailService emailService
+    ) {
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
         this.modelMapper = modelMapper;
-        this.emailService = emailService; // Başlanğıc dəyəri verilir
+        this.emailService = emailService;
     }
 
     /**
-     * ELAVE EDILDI: köməkçi metod - Order.status artıq OrderStatus (enum) tipindədir,
-     * amma OrderDto.status hələ də String-dir (frontend-ə "Hazırlanır" kimi Azərbaycanca
-     * mətn göstərmək üçün). ModelMapper enum-u avtomatik "label"-ə çevirə bilmir,
-     * ona görə bunu əl ilə edirik.
+     * Order obyektini OrderDto-ya çevirir.
+     *
+     * Order.status enum tipindədir,
+     * OrderDto.status isə String tipindədir.
+     * Buna görə statusun Azərbaycanca label dəyərini ayrıca təyin edirik.
      */
     private OrderDto mapToDto(Order order) {
         OrderDto dto = modelMapper.map(order, OrderDto.class);
+
         if (order.getStatus() != null) {
             dto.setStatus(order.getStatus().getLabel());
         }
+
         return dto;
     }
 
+    /**
+     * String status dəyərini OrderStatus enum-una çevirir.
+     *
+     * Həm Azərbaycanca label qəbul edir:
+     * "Hazırlanır"
+     *
+     * Həm də enum adı qəbul edir:
+     * "PENDING"
+     */
+    private OrderStatus parseOrderStatus(String status) {
+
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Sifariş statusu boş ola bilməz."
+            );
+        }
+
+        OrderStatus orderStatus = OrderStatus.fromLabel(status);
+
+        if (orderStatus != null) {
+            return orderStatus;
+        }
+
+        try {
+            return OrderStatus.valueOf(status.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Naməlum sifariş statusu: " + status
+            );
+        }
+    }
+
     @Override
-    @Transactional(readOnly = true) //LazyInitializationException-in qarşısını alır
-    // (order.getOrderItems() lazy-yüklənir, ModelMapper ona toxunanda tranzaksiya
-    // artıq bağlı olmasa xəta verər - "readOnly = true" bunu təhlükəsiz açıq saxlayır)
+    @Transactional(readOnly = true)
     public List<OrderDto> getAllOrders() {
-        return orderRepository.findAll().stream()
-                .map(this::mapToDto) // DƏYİŞDİ: modelMapper.map(...) -> mapToDto (enum->label çevrilməsi üçün)
+        return orderRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    @Transactional(readOnly = true) // ELAVE EDILDI: eyni səbəbdən (LazyInitialization qorunması)
+    @Transactional(readOnly = true)
     public OrderDto getOrderById(Long id) {
-        // orElse(null) əvəzinə, tapa bilmədikdə daha mənalı bir xəta ata bilərsiniz
-        return orderRepository.findById(id)
-                .map(this::mapToDto) // DƏYİŞDİ: modelMapper.map(...) -> mapToDto
-                .orElse(null);
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Sifariş tapılmadı, ID: " + id
+                        )
+                );
+
+        return mapToDto(order);
     }
 
     @Override
     @Transactional
     public OrderDto createOrder(OrderCreateDto orderCreateDto) {
+
         Order order = new Order();
+
         order.setCustomerName(orderCreateDto.getCustomerName());
         order.setCustomerEmail(orderCreateDto.getCustomerEmail());
         order.setCustomerPhone(orderCreateDto.getCustomerPhone());
-        order.setOrderDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.PENDING); // DÜZƏLDİLDİ: .getLabel() silindi - Order.status artıq birbaşa OrderStatus (enum)
+        order.setStatus(OrderStatus.PENDING);
         order.setPaymentMethod(orderCreateDto.getPaymentMethod());
 
-        BigDecimal totalAmount = BigDecimal.ZERO; // DƏYİŞDİ: Double 0.0 -> BigDecimal.ZERO
-        List<OrderItem> orderItems = new ArrayList<>();
+        BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (OrderItemDto itemDto : orderCreateDto.getOrderItems()) {
+
             Product product = productRepository.findById(itemDto.getProductId())
-                    .orElseThrow(() -> new EntityNotFoundException("Məhsul tapılmadı, ID: " + itemDto.getProductId()));
+                    .orElseThrow(() ->
+                            new EntityNotFoundException(
+                                    "Məhsul tapılmadı, ID: "
+                                            + itemDto.getProductId()
+                            )
+                    );
 
             OrderItem orderItem = new OrderItem();
+
             orderItem.setProduct(product);
+
+            // Sifariş zamanı məhsulun adını snapshot kimi saxlayırıq
+            orderItem.setProductName(product.getName());
+
             orderItem.setQuantity(itemDto.getQuantity());
             orderItem.setPrice(product.getPrice());
-            orderItem.setOrder(order);
 
-            // DƏYİŞDİ: Double vurma/toplama əvəzinə BigDecimal-ın öz metodları (dəqiq hesablama üçün)
-            BigDecimal itemTotal = orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
+            // Order ilə OrderItem arasındakı əlaqəni düzgün qurur
+            order.addOrderItem(orderItem);
+
+            BigDecimal itemTotal = product.getPrice()
+                    .multiply(
+                            BigDecimal.valueOf(itemDto.getQuantity())
+                    );
+
             totalAmount = totalAmount.add(itemTotal);
-            orderItems.add(orderItem);
         }
 
-        order.setOrderItems(orderItems);
         order.setTotalAmount(totalAmount);
+
         Order savedOrder = orderRepository.save(order);
 
-        // YENİ ƏLAVƏ: Sifariş təsdiq e-poçtunu göndərmək
+        sendOrderConfirmationEmail(savedOrder);
+
+        return mapToDto(savedOrder);
+    }
+
+    /**
+     * Sifariş təsdiqi ilə bağlı e-poçt göndərir.
+     *
+     * E-poçt göndərilməsə belə,
+     * sifarişin yaradılması ləğv edilmir.
+     */
+    private void sendOrderConfirmationEmail(Order order) {
+
         try {
-            String subject = "Sifariş Təsdiqi! #" + savedOrder.getId();
+            String subject = "Sifariş təsdiqi! #" + order.getId();
+
             String body = String.format(
-                    "Hörmətli %s,\n\nSifarişiniz (%s AZN) uğurla qəbul edildi. Tezliklə sizinlə əlaqə saxlayacağıq.\n\nSifariş ID: %d",
-                    savedOrder.getCustomerName(), savedOrder.getTotalAmount(), savedOrder.getId()
+                    "Hörmətli %s,\n\n"
+                            + "Sifarişiniz (%s AZN) uğurla qəbul edildi. "
+                            + "Tezliklə sizinlə əlaqə saxlayacağıq.\n\n"
+                            + "Sifariş ID: %d",
+
+                    order.getCustomerName(),
+                    order.getTotalAmount(),
+                    order.getId()
             );
 
-            emailService.sendOrderConfirmationEmail(savedOrder.getCustomerEmail(), subject, body);
-        } catch (Exception e) {
-            // E-poçt göndərilməsə belə, sifarişin yaradılmasını ləğv etmirik
-            log.error("Sifariş təsdiqi e-poçtu göndərilməsi zamanı xəta baş verdi", e); // DƏYİŞDİ: System.err -> log.error
-        }
+            emailService.sendOrderConfirmationEmail(
+                    order.getCustomerEmail(),
+                    subject,
+                    body
+            );
 
-        return mapToDto(savedOrder); // DƏYİŞDİ: modelMapper.map(...) -> mapToDto
+        } catch (Exception e) {
+
+            log.error(
+                    "Sifariş təsdiqi e-poçtu göndərilərkən xəta baş verdi. "
+                            + "Sifariş ID: {}",
+                    order.getId(),
+                    e
+            );
+        }
     }
 
     @Override
     @Transactional
     public OrderDto updateOrderStatus(Long id, String status) {
+
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Sifariş tapılmadı, ID: " + id));
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Sifariş tapılmadı, ID: " + id
+                        )
+                );
 
-        // Status artıq sərbəst mətn kimi qəbul edilmir. Admin panelinin
-        // formu Azərbaycanca mətn ("Hazırlanır") göndərdiyi üçün, əvvəlcə label ilə
-        // axtarırıq; tapmasa, enum adı ("PENDING") kimi də yoxlayırıq (PaymentController
-        // "PAID"/"FAILED" göndərəndə bu yol işə düşür). Heç biri uyğun gəlməsə, xəta atılır.
-        OrderStatus orderStatus = OrderStatus.fromLabel(status);
-        if (orderStatus == null) {
-            try {
-                orderStatus = OrderStatus.valueOf(status.trim().toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Naməlum sifariş statusu: " + status +
-                        ". Mümkün dəyərlər: Hazırlanır, Ödənildi, Uğursuz, Göndərildi, Ləğv edildi");
-            }
-        }
+        OrderStatus orderStatus = parseOrderStatus(status);
 
-        order.setStatus(orderStatus); // DÜZƏLDİLDİ: .getLabel() silindi - birbaşa enum-un özü set edilir
+        order.setStatus(orderStatus);
+
         Order updatedOrder = orderRepository.save(order);
 
-        return mapToDto(updatedOrder); // DƏYİŞDİ: modelMapper.map(...) -> mapToDto
+        return mapToDto(updatedOrder);
     }
+
 }
