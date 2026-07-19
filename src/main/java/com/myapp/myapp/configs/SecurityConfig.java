@@ -37,6 +37,21 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/contact").permitAll()
                         .requestMatchers(HttpMethod.POST, "/book-a-table").permitAll()
 
+                        // ELAVE EDILDI: Müştəri yeni sifariş yarada bilər (səbətə əlavə/checkout)
+                        .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
+                        // ELAVE EDILDI: Müştəri öz səbətinə baxa bilər (bu qayda GET /api/orders/* qaydasından ƏVVƏL olmalıdır,
+                        // əks halda aşağıdakı "/api/orders/*" ADMIN qaydası "cart"-ı da tutub bloklayar)
+                        .requestMatchers(HttpMethod.GET, "/api/orders/cart").permitAll()
+                        // ELAVE EDILDI: Ödəniş başlatma da müştəri üçün açıq qalır
+                        .requestMatchers(HttpMethod.POST, "/api/orders/create-payment").permitAll()
+
+                        // ELAVE EDILDI: Bütün sifarişlərin siyahısı (müştəri adı/email/telefon daxil)
+                        // əvvəllər QORUNMURDU - istənilən kəs bu linkə girib bütün məlumatları görə bilərdi.
+                        // İndi yalnız daxil olmuş admin baxa bilər.
+                        .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
+                        // ELAVE EDILDI: ID ilə tək sifarişə baxmaq da eyni səbəbdən yalnız admin üçün
+                        .requestMatchers(HttpMethod.GET, "/api/orders/*").hasRole("ADMIN")
+
                         // Qayda 3 Admin ilə başlayan hər şeyə yalnız daxil olan istifadəçilər baxa bilər
                         .requestMatchers("/admin/**").authenticated()
 
