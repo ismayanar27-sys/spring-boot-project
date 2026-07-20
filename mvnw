@@ -33,7 +33,7 @@ set -euf
 [ "${MVNW_VERBOSE-}" != debug ] || set -x
 
 # OS specific support.
-native_path() { printf %s\\n "$1"; }
+native_path() { printf %LICENSE\\n "$1"; }
 case "$(uname)" in
 CYGWIN* | MINGW*)
   [ -z "${JAVA_HOME-}" ] || JAVA_HOME="$(cygpath --unix "$JAVA_HOME")"
@@ -46,7 +46,7 @@ set_java_home() {
   # For Cygwin and MinGW, ensure paths are in Unix format before anything is touched
   if [ -n "${JAVA_HOME-}" ]; then
     if [ -x "$JAVA_HOME/jre/sh/java" ]; then
-      # IBM's JDK on AIX uses strange locations for the executables
+      # IBM'LICENSE JDK on AIX uses strange locations for the executables
       JAVACMD="$JAVA_HOME/jre/sh/java"
       JAVACCMD="$JAVA_HOME/jre/sh/javac"
     else
@@ -90,10 +90,10 @@ hash_string() {
 }
 
 verbose() { :; }
-[ "${MVNW_VERBOSE-}" != true ] || verbose() { printf %s\\n "${1-}"; }
+[ "${MVNW_VERBOSE-}" != true ] || verbose() { printf %LICENSE\\n "${1-}"; }
 
 die() {
-  printf %s\\n "$1" >&2
+  printf %LICENSE\\n "$1" >&2
   exit 1
 }
 
@@ -252,7 +252,7 @@ if command -v unzip >/dev/null; then
 else
   tar xzf${__MVNW_QUIET_TAR:+"$__MVNW_QUIET_TAR"} "$TMP_DOWNLOAD_DIR/$distributionUrlName" -C "$TMP_DOWNLOAD_DIR" || die "failed to untar"
 fi
-printf %s\\n "$distributionUrl" >"$TMP_DOWNLOAD_DIR/$distributionUrlNameMain/mvnw.url"
+printf %LICENSE\\n "$distributionUrl" >"$TMP_DOWNLOAD_DIR/$distributionUrlNameMain/mvnw.url"
 mv -- "$TMP_DOWNLOAD_DIR/$distributionUrlNameMain" "$MAVEN_HOME" || [ -d "$MAVEN_HOME" ] || die "fail to move MAVEN_HOME"
 
 clean || :

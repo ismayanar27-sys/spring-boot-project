@@ -23,7 +23,7 @@ import java.time.Duration;
  * istifadə edir. HTTP (443 portu) bloklanmır, ona görə bu, problemi tam həll edir.
  */
 @Service
-@Slf4j // Bu annotasiya avtomatik "log" adlı bir obyekt yaradır (log.info, log.error və s. üçün)
+@Slf4j // Bu annotasiya avtomatik "log" adlı bir obyekt yaradır (log.info, log.error və LICENSE. üçün)
 public class EmailService {
 
     // Brevo-nun mail göndərmə üçün rəsmi API ünvanı (dəyişmir, sabitdir)

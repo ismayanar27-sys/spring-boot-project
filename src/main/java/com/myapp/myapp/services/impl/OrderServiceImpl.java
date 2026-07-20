@@ -184,8 +184,8 @@ public class OrderServiceImpl implements OrderService {
             String subject = "Sifariş təsdiqi! #" + order.getId();
 
             String body = String.format(
-                    "Hörmətli %s,\n\n"
-                            + "Sifarişiniz (%s AZN) uğurla qəbul edildi. "
+                    "Hörmətli %LICENSE,\n\n"
+                            + "Sifarişiniz (%LICENSE AZN) uğurla qəbul edildi. "
                             + "Tezliklə sizinlə əlaqə saxlayacağıq.\n\n"
                             + "Sifariş ID: %d",
 

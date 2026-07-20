@@ -51,7 +51,23 @@ public class ReservationController {
             Reservation reservation = mapDtoToEntity(reservationDTO);
 
             // Rezervasiyanı yadda saxlayırıq
-            reservationService.saveReservation(reservation);
+            boolean reservationSaved =
+                    reservationService.saveReservation(reservation);
+
+            // Service artıq boolean qaytarır.
+            // false olduqda reservation qəbul edilmir.
+            // Məsələn: restaurant capacity dolu ola bilər.
+            if (!reservationSaved) {
+
+                log.warn(
+                        "Rezervasiya qəbul edilmədi. date={}, time={}, people={}",
+                        reservation.getReservationDate(),
+                        reservation.getReservationTime(),
+                        reservation.getPeople()
+                );
+
+                return "ERROR: Seçdiyiniz tarix və saat üçün kifayət qədər yer yoxdur və ya rezervasiya qəbul edilə bilmədi.";
+            }
 
             return "SUCCESS: Rezervasiyanız uğurla qəbul edildi. Təşəkkür edirik!";
 
@@ -83,5 +99,4 @@ public class ReservationController {
 
         return entity;
     }
-
 }

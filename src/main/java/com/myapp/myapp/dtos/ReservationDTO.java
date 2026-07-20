@@ -4,10 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -27,7 +25,17 @@ public class ReservationDTO {
     private String phone;
 
     @NotNull(message = "Tarix seçilməlidir.")
-    @PastOrPresent(message = "Rezervasiya tarixi keçmiş tarix ola bilməz.")
+
+    /*
+     * SİLİNDİ: @PastOrPresent
+     *
+     * SƏBƏB:
+     * @PastOrPresent yalnız LocalDate-i yoxlayırdı.
+     * LocalDate və LocalTime birlikdə yoxlanılmadığı üçün
+     * bu günün keçmiş saatına reservation etmək mümkün idi.
+     *
+     * Tarix + saat yoxlaması Service qatında birlikdə aparılacaq.
+     */
     private LocalDate date;
 
     @NotNull(message = "Saat seçilməlidir.")
@@ -39,5 +47,4 @@ public class ReservationDTO {
 
     @Size(max = 500, message = "Mesaj 500 simvoldan çox ola bilməz.")
     private String message;
-
 }

@@ -1,15 +1,15 @@
 package com.myapp.myapp.services.impl;
 
 import com.myapp.myapp.models.Reservation;
+import com.myapp.myapp.models.ReservationStatus;
 import com.myapp.myapp.repositories.ReservationRepository;
 import com.myapp.myapp.services.EmailService;
 import com.myapp.myapp.services.ReservationService;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -22,6 +22,11 @@ public class ReservationServiceImpl implements ReservationService {
     @Value("${admin.email.recipient:ismayanar27@gmail.com}")
     private String adminEmailRecipient;
 
+    //Restaurantın maksimum tutumu.
+    // application.properties-də restaurant.capacity ilə dəyişdirilə bilər.
+    @Value("${restaurant.capacity:50}")
+    private int restaurantCapacity;
+
     // Konstruktor vasitəsilə asılılıqların inyeksiyası
     public ReservationServiceImpl(
             ReservationRepository reservationRepository,
@@ -33,7 +38,59 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public void saveReservation(Reservation reservation) {
+    public boolean saveReservation(Reservation reservation) {
+
+        // Tarix və saat birlikdə yoxlanılır.
+        // Bu günün keçmiş saatına reservation edilməsinin qarşısını alır.
+        if (reservation.getReservationDate() == null
+                || reservation.getReservationTime() == null) {
+
+            log.warn("Reservation tarixi və ya saatı boşdur.");
+
+            return false;
+        }
+
+        LocalDateTime reservationDateTime = LocalDateTime.of(
+                reservation.getReservationDate(),
+                reservation.getReservationTime()
+        );
+
+        if (reservationDateTime.isBefore(LocalDateTime.now())) {
+
+            log.warn(
+                    "Keçmiş tarixə reservation cəhdi edildi. date={}, time={}",
+                    reservation.getReservationDate(),
+                    reservation.getReservationTime()
+            );
+
+            return false;
+        }
+
+        // Restaurant capacity yoxlanılır.
+        // eyni tarix və saat üzrə aktiv reservation-lar
+        // database-dən gətirilir.
+        int reservedPeople = reservationRepository
+                .findByReservationDateAndReservationTimeAndStatusNot(
+                        reservation.getReservationDate(),
+                        reservation.getReservationTime(),
+                        ReservationStatus.CANCELLED
+                )
+                .stream()
+                .mapToInt(Reservation::getPeople)
+                .sum();
+
+        if (reservedPeople + reservation.getPeople() > restaurantCapacity) {
+
+            log.warn(
+                    "Restaurant capacity doludur. date={}, time={}, reservedPeople={}, requestedPeople={}",
+                    reservation.getReservationDate(),
+                    reservation.getReservationTime(),
+                    reservedPeople,
+                    reservation.getPeople()
+            );
+
+            return false;
+        }
 
         // Rezervasiyanı bazaya yazırıq
         Reservation savedReservation =
@@ -41,6 +98,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         // Rezervasiya bazaya yazıldıqdan sonra adminə bildiriş göndəririk
         sendAdminNotification(savedReservation);
+
+        return true;
     }
 
     private void sendAdminNotification(Reservation reservation) {
@@ -50,13 +109,14 @@ public class ReservationServiceImpl implements ReservationService {
                     "Yeni rezervasiya: " + reservation.getName();
 
             final String body = String.format(
-                    "<b>Ad:</b> %s<br>" +
-                            "<b>Telefon:</b> %s<br>" +
-                            "<b>E-poçt:</b> %s<br>" +
-                            "<b>Tarix:</b> %s<br>" +
-                            "<b>Saat:</b> %s<br>" +
-                            "<b>Nəfər sayı:</b> %s<br>" +
-                            "<h3>Qeyd:</h3>%s",
+                    "<b>Ad:</b> %LICENSE<br>" +
+                            "<b>Telefon:</b> %LICENSE<br>" +
+                            "<b>E-poçt:</b> %LICENSE<br>" +
+                            "<b>Tarix:</b> %LICENSE<br>" +
+                            "<b>Saat:</b> %LICENSE<br>" +
+                            "<b>Nəfər sayı:</b> %LICENSE<br>" +
+                            "<b>Status:</b> %LICENSE<br>" +
+                            "<h3>Qeyd:</h3>%LICENSE",
 
                     reservation.getName(),
                     reservation.getPhone(),
@@ -64,6 +124,7 @@ public class ReservationServiceImpl implements ReservationService {
                     reservation.getReservationDate(),
                     reservation.getReservationTime(),
                     reservation.getPeople(),
+                    reservation.getStatus(),
                     reservation.getMessage()
             );
 
@@ -89,7 +150,13 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional(readOnly = true)
     public long countReservations() {
-        return reservationRepository.count();
-    }
 
+        //Yalnız aktiv reservation-lar sayılır.
+        return reservationRepository.findAll()
+                .stream()
+                .filter(reservation ->
+                        reservation.getStatus() != ReservationStatus.CANCELLED
+                )
+                .count();
+    }
 }

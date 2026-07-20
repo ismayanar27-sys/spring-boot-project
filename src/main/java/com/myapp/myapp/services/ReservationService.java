@@ -4,10 +4,17 @@ import com.myapp.myapp.models.Reservation;
 
 public interface ReservationService {
 
-    // Artıq geriyə obyekti qaytarmağa ehtiyac yoxdur.
-    // Sadəcə məlumatın bazaya yazılması kifayətdir.
-    void saveReservation(Reservation reservation);
+    /* Reservation artıq yalnız bazaya yazılmır.
+     * Tarix + saat və restaurant capacity yoxlamaları
+     * Service qatında aparılır.
+     *
+     * Buna görə əməliyyatın uğurlu olub-olmadığını
+     * Controller-ə qaytarmaq üçün boolean istifadə olunur.
+     */
 
-    // YENİ METOD: Rezervasiyaların ümumi sayını gətirir (Projects sayğacı üçün)
+    // Rezervasiyanı validation və capacity yoxlamasından keçirərək yadda saxlayır.
+    boolean saveReservation(Reservation reservation);
+
+    // YENİ METOD: Aktiv rezervasiyaların ümumi sayını gətirir (Projects sayğacı üçün)
     long countReservations();
 }

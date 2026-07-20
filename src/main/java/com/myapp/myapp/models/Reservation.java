@@ -1,12 +1,13 @@
 package com.myapp.myapp.models;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -41,6 +42,10 @@ public class Reservation {
     // Rezervasiyanın bazaya yazılma vaxtı
     private LocalDateTime createdAt;
 
+    // ƏLAVƏ EDİLDİ: Reservation statusunu idarə etmək üçün istifadə olunur.
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status;
+
     // Boş Konstruktor (JPA üçün vacibdir)
     public Reservation() {
     }
@@ -68,6 +73,11 @@ public class Reservation {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+
+        // ƏLAVƏ EDİLDİ: Yeni reservation default olaraq PENDING statusu ilə başlayır.
+        if (this.status == null) {
+            this.status = ReservationStatus.PENDING;
+        }
     }
 
     public Long getId() {
@@ -140,5 +150,14 @@ public class Reservation {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    // ƏLAVƏ EDİLDİ: Reservation statusunun getter və setter metodları.
+    public ReservationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReservationStatus status) {
+        this.status = status;
     }
 }
