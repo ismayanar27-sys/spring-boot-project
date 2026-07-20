@@ -109,14 +109,14 @@ public class ReservationServiceImpl implements ReservationService {
                     "Yeni rezervasiya: " + reservation.getName();
 
             final String body = String.format(
-                    "<b>Ad:</b> %LICENSE<br>" +
-                            "<b>Telefon:</b> %LICENSE<br>" +
-                            "<b>E-poçt:</b> %LICENSE<br>" +
-                            "<b>Tarix:</b> %LICENSE<br>" +
-                            "<b>Saat:</b> %LICENSE<br>" +
-                            "<b>Nəfər sayı:</b> %LICENSE<br>" +
-                            "<b>Status:</b> %LICENSE<br>" +
-                            "<h3>Qeyd:</h3>%LICENSE",
+                    "<b>Ad:</b> %s<br>" +
+                            "<b>Telefon:</b> %s<br>" +
+                            "<b>E-poçt:</b> %s<br>" +
+                            "<b>Tarix:</b> %s<br>" +
+                            "<b>Saat:</b> %s<br>" +
+                            "<b>Nəfər sayı:</b> %s<br>" +
+                            "<b>Status:</b> %s<br>" +
+                            "<h3>Qeyd:</h3>%s",
 
                     reservation.getName(),
                     reservation.getPhone(),

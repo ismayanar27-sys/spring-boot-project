@@ -50,8 +50,8 @@ public class ContactServiceImpl implements ContactService {
         try {
             final String subject = "YENİ ƏLAQƏ MESAJI: " + contact.getSubject();
             final String body = String.format(
-                    "<b>Kimdən:</b> %LICENSE<br><b>Email:</b> %LICENSE<br><b>Mövzu:</b> %LICENSE<br><b>Göndərilmə Tarixi:</b> %LICENSE<br>" +
-                            "<h3>Mesaj:</h3>%LICENSE",
+                    "<b>Kimdən:</b> %s<br><b>Email:</b> %s<br><b>Mövzu:</b> %s<br><b>Göndərilmə Tarixi:</b> %s<br>" +
+                            "<h3>Mesaj:</h3>%s",
                     contact.getName(),
                     contact.getEmail(),
                     contact.getSubject(),
