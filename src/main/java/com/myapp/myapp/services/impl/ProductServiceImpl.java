@@ -8,168 +8,275 @@ import com.myapp.myapp.repositories.ProductRepository;
 import com.myapp.myapp.services.CloudinaryService;
 import com.myapp.myapp.services.ProductService;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j; // ELAVE EDILDI: Loglama ucun
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-@Slf4j // ELAVE EDILDI: Audit ucun loglama aktiv edildi
+@Slf4j
 public class ProductServiceImpl implements ProductService {
+
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
     private final CloudinaryService cloudinaryService;
 
-    public ProductServiceImpl(ProductRepository productRepository, ModelMapper modelMapper, CloudinaryService cloudinaryService) {
+    public ProductServiceImpl(
+            ProductRepository productRepository,
+            ModelMapper modelMapper,
+            CloudinaryService cloudinaryService
+    ) {
         this.productRepository = productRepository;
         this.modelMapper = modelMapper;
         this.cloudinaryService = cloudinaryService;
     }
 
     @Override
-    @Cacheable(value = "products") //Bazadan melumati bir defe oxuyub RAM-da saxlayacaq
+    @Cacheable(value = "products")
     public List<ProductDto> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-        return products.stream().map(x -> modelMapper.map(x, ProductDto.class)).toList();
+
+        return productRepository.findAll()
+                .stream()
+                .map(product -> modelMapper.map(product, ProductDto.class))
+                .toList();
     }
 
-    // Məhsul tapılmadıqda 'RuntimeException' atır (Controller üçün)
     @Override
     public ProductDto getProductsId(Long id) {
+
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Məhsul tapılmadı: ID " + id));
+                .orElseThrow(() ->
+                        new RuntimeException("Məhsul tapılmadı: ID " + id)
+                );
+
         return modelMapper.map(product, ProductDto.class);
     }
 
     @Override
-    @CacheEvict(value = "products", allEntries = true) // ELAVE EDILDI: Yeni mehsul gelende kohnelmis kesi temizleyir
-    public boolean createProducts(ProductCreateDto productCreateDto, MultipartFile image) {
-        // Məhsul adının unikallığı yoxlanılır
-        Product findProduct = productRepository.findProductByName(productCreateDto.getName());
-        if (findProduct != null) {
+    @CacheEvict(value = "products", allEntries = true)
+    public boolean createProducts(
+            ProductCreateDto productCreateDto,
+            MultipartFile image
+    ) {
+
+        Product existingProduct =
+                productRepository.findByNameIgnoreCase(productCreateDto.getName());
+
+        if (existingProduct != null) {
             return false;
         }
 
-        // Şəkilin yüklənib-yüklənməməsi yoxlanılır
         if (image == null || image.isEmpty()) {
             return false;
         }
 
         try {
-            // Şəkil Cloudinary-ə yüklənir
+
             String photoUrl = cloudinaryService.uploadImage(image);
 
-            // DTO-dan Product obyektinə çevrilir
-            Product product = modelMapper.map(productCreateDto, Product.class);
-            product.setPhotoUrl(photoUrl); // Şəkil URL-i Product obyektinə əlavə edilir
+            Product product =
+                    modelMapper.map(productCreateDto, Product.class);
+
+            product.setPhotoUrl(photoUrl);
 
             productRepository.save(product);
+
+            log.info(
+                    "Məhsul uğurla yaradıldı. name={}",
+                    product.getName()
+            );
+
             return true;
+
         } catch (Exception e) {
-            log.error("Mehsul elave edilerken xeta bas verdi: {}", productCreateDto.getName(), e); // DƏYİŞDİ: e.printStackTrace() -> log.error
+
+            log.error(
+                    "Məhsul yaradılarkən xəta baş verdi. name={}",
+                    productCreateDto.getName(),
+                    e
+            );
+
             return false;
         }
     }
 
-    // Redaktə DTO-su üçün məhsulu tapır. Əgər tapılmasa, xəta atır (Controller üçün)
     @Override
     public ProductUpdateDto findProductById(Long id) {
+
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Məhsul tapılmadı: ID " + id));
+                .orElseThrow(() ->
+                        new RuntimeException("Məhsul tapılmadı: ID " + id)
+                );
 
         return modelMapper.map(product, ProductUpdateDto.class);
     }
 
     @Override
     @Transactional
-    @CacheEvict(value = "products", allEntries = true) // ELAVE EDILDI: Mehsul deyisende siyahini yenileyir
-    public boolean updateProducts(ProductUpdateDto productUpdateDto, Long id, MultipartFile image) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
+    @CacheEvict(value = "products", allEntries = true)
+    public boolean updateProducts(
+            ProductUpdateDto productUpdateDto,
+            Long id,
+            MultipartFile image
+    ) {
 
-        //Məhsul tapılmadıqda false qaytarılır
-        if (optionalProduct.isEmpty()) {
+        Product product = productRepository.findById(id)
+                .orElse(null);
+
+        if (product == null) {
             return false;
         }
 
-        Product product = optionalProduct.get();
-
-        // Əgər DTO-dakı ad mövcud məhsulun adı deyilsə, unikallığı yoxla
         if (!product.getName().equalsIgnoreCase(productUpdateDto.getName())) {
-            Product existingProduct = productRepository.findProductByName(productUpdateDto.getName());
+
+            Product existingProduct =
+                    productRepository.findByNameIgnoreCase(
+                            productUpdateDto.getName()
+                    );
+
             if (existingProduct != null) {
-                // Ad artıq başqa bir məhsulda istifadə olunur
                 return false;
             }
         }
 
-        // Məlumatları DTO-dan mövcud Product-a köçürür
-        modelMapper.map(productUpdateDto, product);
+        String oldPhotoUrl = product.getPhotoUrl();
+        String newPhotoUrl = null;
 
-        if (image != null && !image.isEmpty()) {
-            try {
-                // Köhnə şəkli sil
-                if (product.getPhotoUrl() != null && !product.getPhotoUrl().isEmpty()) {
-                    cloudinaryService.deleteImage(product.getPhotoUrl());
+        try {
+
+            /*
+             * YENİ ŞƏKİL ƏVVƏL CLOUDINARY-YƏ YÜKLƏNİR.
+             * Köhnə şəkil hələ silinmir.
+             */
+            if (image != null && !image.isEmpty()) {
+
+                newPhotoUrl = cloudinaryService.uploadImage(image);
+            }
+
+            /*DTO-dakı məhsul məlumatları mövcud Entity-yə köçürülür.
+             * ProductUpdateDto-dan id silinməlidir.
+             * Entity ID-si URL-dəki id ilə idarə olunur.
+             */
+            modelMapper.map(productUpdateDto, product);
+
+            if (newPhotoUrl != null) {
+                product.setPhotoUrl(newPhotoUrl);
+            }
+
+            productRepository.save(product);
+
+            /*
+             * Database save-dən sonra köhnə şəkil silinir.
+             */
+            if (newPhotoUrl != null
+                    && oldPhotoUrl != null
+                    && !oldPhotoUrl.isBlank()) {
+
+                cloudinaryService.deleteImage(oldPhotoUrl);
+            }
+
+            log.info(
+                    "Məhsul uğurla yeniləndi. ID={}",
+                    id
+            );
+
+            return true;
+
+        } catch (Exception e) {
+
+            /*
+             * Yeni şəkil yüklənib, amma sonrakı mərhələdə xəta baş veribsə,
+             * yeni Cloudinary şəklini silməyə çalışırıq.
+             */
+            if (newPhotoUrl != null) {
+
+                try {
+                    cloudinaryService.deleteImage(newPhotoUrl);
+                } catch (Exception cleanupException) {
+
+                    log.error(
+                            "Yeni Cloudinary şəklinin cleanup prosesi uğursuz oldu. ID={}",
+                            id,
+                            cleanupException
+                    );
                 }
-
-                // Yenisini yüklə
-                String photoUrl = cloudinaryService.uploadImage(image);
-                product.setPhotoUrl(photoUrl);
-            } catch (Exception e) {
-                log.error("Mehsul sekli yenilenerken xeta bas verdi, ID: {}", id, e); // DƏYİŞDİ: e.printStackTrace() -> log.error
-                // Şəkil yükləmədə problem varsa
-                return false;
             }
+
+            log.error(
+                    "Məhsul yenilənərkən xəta baş verdi. ID={}",
+                    id,
+                    e
+            );
+
+            return false;
         }
-        // Şəkil yüklənməsə də, DTO-dan gələn digər məlumatlarla məhsulu yaddaşa yaz
-        productRepository.save(product);
-        return true;
     }
 
     @Override
     @Transactional
-    @CacheEvict(value = "products", allEntries = true) //Mehsul silinende siyahini yenileyir
+    @CacheEvict(value = "products", allEntries = true)
     public boolean deleteProducts(Long id) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
 
-        if (optionalProduct.isEmpty()) {
+        Product product = productRepository.findById(id)
+                .orElse(null);
+
+        if (product == null) {
             return false;
         }
 
         try {
-            Product product = optionalProduct.get();
-            // Cloudinary-dən şəkli sil
-            cloudinaryService.deleteImage(product.getPhotoUrl());
-            productRepository.deleteById(id);
+
+            String photoUrl = product.getPhotoUrl();
+
+            productRepository.delete(product);
+
+            if (photoUrl != null && !photoUrl.isBlank()) {
+                cloudinaryService.deleteImage(photoUrl);
+            }
+
+            log.info(
+                    "Məhsul uğurla silindi. ID={}",
+                    id
+            );
+
             return true;
+
         } catch (Exception e) {
-            log.error("Mehsul silinerken xeta bas verdi, ID: {}", id, e); // DƏYİŞDİ: e.printStackTrace() -> log.error
+
+            log.error(
+                    "Məhsul silinərkən xəta baş verdi. ID={}",
+                    id,
+                    e
+            );
+
             return false;
         }
     }
 
     @Override
     public List<ProductDto> searchProducts(String keyword) {
-        String trimmedKeyword = keyword.trim().toLowerCase();
-        List<Product> products = productRepository.findByNameContainingOrDescriptionContaining(trimmedKeyword, trimmedKeyword);
-        return products.stream()
+
+        if (keyword == null || keyword.isBlank()) {
+            return getAllProducts();
+        }
+
+        String trimmedKeyword = keyword.trim();
+
+        return productRepository
+                .findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                        trimmedKeyword,
+                        trimmedKeyword
+                )
+                .stream()
                 .map(product -> modelMapper.map(product, ProductDto.class))
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    /**
-     * Workers/Products sayğacını dinamikləşdirmək üçün verilənlər bazasındakı
-     * bütün məhsulların (Product) sayını qaytarır.
-     */
     @Override
     public long countProducts() {
-        // ProductRepository interfeysində avtomatik olaraq təmin olunan count() metodunu çağırır.
         return productRepository.count();
     }
 }

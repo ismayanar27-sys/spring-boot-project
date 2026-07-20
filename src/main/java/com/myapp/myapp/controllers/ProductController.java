@@ -5,7 +5,7 @@ import com.myapp.myapp.dtos.ProductDtos.ProductDto;
 import com.myapp.myapp.dtos.ProductDtos.ProductUpdateDto;
 import com.myapp.myapp.services.ProductService;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j; // ELAVE EDILDI: Loglama ucun
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin/products")
-@Slf4j //Audit ucun loglama
+@Slf4j
 public class ProductController {
 
     private final ProductService productService;
@@ -26,131 +26,253 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // Əsas məhsullar siyahısı və axtarış nəticələrini göstərmək üçün metod
+    // Məhsullar siyahısı və axtarış nəticələrini göstərir.
     @GetMapping
-    public String getAllProducts(@RequestParam(value = "keyword", required = false) String keyword, Model model) {
+    public String getAllProducts(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            Model model
+    ) {
         List<ProductDto> products;
-        if (keyword != null && !keyword.isEmpty()) {
-            log.info("Mehsul axtarisi edilir: keyword = {}", keyword); // AUDIT LOG
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            log.info("Məhsul axtarışı edilir: keyword={}", keyword);
+
             products = productService.searchProducts(keyword);
             model.addAttribute("keyword", keyword);
         } else {
             products = productService.getAllProducts();
         }
+
         model.addAttribute("products", products);
+
         return "admin/products/products";
     }
 
+    // Məhsul detallarını göstərir.
     @GetMapping("/{id}")
-    public String getProductById(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String getProductById(
+            @PathVariable Long id,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
         try {
             ProductDto product = productService.getProductsId(id);
+
             model.addAttribute("product", product);
+
             return "admin/products/product-details";
+
         } catch (RuntimeException e) {
-            log.error("Mehsul tapilmadi ID: {}", id); // AUDIT LOG
-            redirectAttributes.addFlashAttribute("errorMessage", "Xəta: Məhsul ID-si (" + id + ") tapılmadı.");
+            log.error("Məhsul tapılmadı. ID={}", id, e);
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Məhsul tapılmadı."
+            );
+
             return "redirect:/admin/products";
         }
     }
 
-    // GET /add: Yeni məhsul əlavə etmə forması
+    // Yeni məhsul əlavə etmə forması.
     @GetMapping("/add")
     public String addProductForm(Model model) {
+
         if (!model.containsAttribute("productCreateDto")) {
-            model.addAttribute("productCreateDto", new ProductCreateDto());
+            model.addAttribute(
+                    "productCreateDto",
+                    new ProductCreateDto()
+            );
         }
+
         return "admin/products/add-product";
     }
 
-    // POST /add: Yeni məhsul əlavə etmə prosesi
+    // Yeni məhsul əlavə edir.
     @PostMapping("/add")
-    public String addProduct(@Valid @ModelAttribute("productCreateDto") ProductCreateDto productCreateDto,
-                             BindingResult bindingResult,
-                             @RequestParam("image") MultipartFile image,
-                             RedirectAttributes redirectAttributes) {
+    public String addProduct(
+            @Valid @ModelAttribute("productCreateDto")
+            ProductCreateDto productCreateDto,
+
+            BindingResult bindingResult,
+
+            RedirectAttributes redirectAttributes
+    ) {
 
         if (bindingResult.hasErrors()) {
-            log.warn("Yeni mehsul elave edilerken validasiya xetasi bas verdi"); // AUDIT LOG
+            log.warn("Məhsul əlavə edilərkən validation xətası baş verdi.");
+
             return "admin/products/add-product";
         }
 
-        if (image.isEmpty()) {
-            bindingResult.rejectValue("name", "error.productCreateDto", "Şəkil faylı yüklənməlidir.");
+        if (productCreateDto.getImage() == null
+                || productCreateDto.getImage().isEmpty()) {
+
+            bindingResult.reject(
+                    "image.required",
+                    "Şəkil faylı yüklənməlidir."
+            );
+
             return "admin/products/add-product";
         }
 
-        boolean success = productService.createProducts(productCreateDto, image);
+        boolean success = productService.createProducts(
+                productCreateDto,
+                productCreateDto.getImage()
+        );
 
         if (success) {
-            log.info("Mehsul ugurla elave edildi: {}", productCreateDto.getName()); // AUDIT LOG
-            redirectAttributes.addFlashAttribute("successMessage", "Məhsul uğurla əlavə edildi!");
+            log.info(
+                    "Məhsul uğurla əlavə edildi. name={}",
+                    productCreateDto.getName()
+            );
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Məhsul uğurla əlavə edildi!"
+            );
+
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Məhsul adı artıq mövcuddur və ya daxili xəta baş verdi.");
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Məhsul adı artıq mövcuddur və ya daxili xəta baş verdi."
+            );
         }
 
         return "redirect:/admin/products";
     }
 
-    // GET /edit/{id}: Məhsulu redaktə formasına göndərən metod
+    // Məhsulu redaktə formasında göstərir.
     @GetMapping("/edit/{id}")
-    public String editProductForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String editProductForm(
+            @PathVariable Long id,
+            Model model,
+            RedirectAttributes redirectAttributes
+    ) {
         try {
-            // Əgər validasiya xətası yoxdursa (yəni birbaşa GEt ilə gəlirsə)
+
             if (!model.containsAttribute("productUpdateDto")) {
-                ProductUpdateDto productUpdateDto = productService.findProductById(id);
-                model.addAttribute("productUpdateDto", productUpdateDto);
+
+                ProductUpdateDto productUpdateDto =
+                        productService.findProductById(id);
+
+                model.addAttribute(
+                        "productUpdateDto",
+                        productUpdateDto
+                );
             }
+
             return "admin/products/edit-product";
+
         } catch (RuntimeException e) {
-            log.error("Redakte ucun mehsul tapilmadi ID: {}", id); // AUDIT LOG
-            // Məhsul tapılmadıqda
-            redirectAttributes.addFlashAttribute("errorMessage", "Redaktə etmək istədiyiniz məhsul tapılmadı.");
+
+            log.error(
+                    "Redaktə üçün məhsul tapılmadı. ID={}",
+                    id,
+                    e
+            );
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Redaktə etmək istədiyiniz məhsul tapılmadı."
+            );
+
             return "redirect:/admin/products";
         }
     }
 
-    // POST /update/{id}: Yeniləmə prosesi
+    // Məhsulu yeniləyir.
     @PostMapping("/update/{id}")
-    public String updateProduct(@PathVariable Long id,
-                                @Valid @ModelAttribute("productUpdateDto") ProductUpdateDto productUpdateDto,
-                                BindingResult bindingResult,
-                                @RequestParam(value = "image", required = false) MultipartFile image,
-                                RedirectAttributes redirectAttributes) {
+    public String updateProduct(
+            @PathVariable Long id,
 
-        // 1. DTO validasiya səhvlərini yoxla
+            @Valid @ModelAttribute("productUpdateDto")
+            ProductUpdateDto productUpdateDto,
+
+            BindingResult bindingResult,
+
+            @RequestParam(
+                    value = "image",
+                    required = false
+            )
+            MultipartFile image,
+
+            RedirectAttributes redirectAttributes
+    ) {
+
         if (bindingResult.hasErrors()) {
-            log.warn("Mehsul yenilenirken validasiya xetasi (ID: {})", id); // AUDIT LOG
-            // RedirectAttributes vasitəsilə BindingResult-u və DTO-nu ötürürük.
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.productUpdateDto", bindingResult);
-            redirectAttributes.addFlashAttribute("productUpdateDto", productUpdateDto);
-            // Və GET metoduna yönləndir
+
+            log.warn(
+                    "Məhsul yenilənərkən validation xətası baş verdi. ID={}",
+                    id
+            );
+
+            redirectAttributes.addFlashAttribute(
+                    "org.springframework.validation.BindingResult.productUpdateDto",
+                    bindingResult
+            );
+
+            redirectAttributes.addFlashAttribute(
+                    "productUpdateDto",
+                    productUpdateDto
+            );
+
             return "redirect:/admin/products/edit/" + id;
         }
 
-        // 2. Service-ə ötür
-        boolean success = productService.updateProducts(productUpdateDto, id, image);
+        boolean success = productService.updateProducts(
+                productUpdateDto,
+                id,
+                image
+        );
 
         if (success) {
-            log.info("Mehsul yenilendi ID: {}", id); // AUDIT LOG
-            redirectAttributes.addFlashAttribute("successMessage", "Məhsul uğurla yeniləndi!");
+
+            log.info(
+                    "Məhsul uğurla yeniləndi. ID={}",
+                    id
+            );
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Məhsul uğurla yeniləndi!"
+            );
+
         } else {
-            // Məhsul tapılmadıqda və ya ad təkrarlandıqda
-            redirectAttributes.addFlashAttribute("errorMessage", "Yenilənmə zamanı xəta: Məhsul tapılmadı və ya ad artıq mövcuddur.");
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Yenilənmə zamanı xəta baş verdi."
+            );
         }
 
         return "redirect:/admin/products";
     }
 
+    // Məhsulu silir.
     @PostMapping("/delete/{id}")
-    public String deleteProduct(@PathVariable Long id,
-                                RedirectAttributes redirectAttributes) {
-        log.info("Mehsul silinir ID: {}", id); // AUDIT LOG
+    public String deleteProduct(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes
+    ) {
+
+        log.info("Məhsul silinir. ID={}", id);
+
         boolean success = productService.deleteProducts(id);
+
         if (success) {
-            redirectAttributes.addFlashAttribute("successMessage", "Məhsul uğurla silindi!");
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Məhsul uğurla silindi!"
+            );
+
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Məhsulu silərkən xəta baş verdi. Məhsul tapılmadı.");
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Məhsulu silərkən xəta baş verdi. Məhsul tapılmadı."
+            );
         }
         return "redirect:/admin/products";
     }

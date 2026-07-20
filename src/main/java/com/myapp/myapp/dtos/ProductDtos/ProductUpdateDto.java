@@ -5,45 +5,41 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.math.BigDecimal;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Data
 public class ProductUpdateDto {
 
     private Long id;
 
-    // Məhsul adı boş ola bilməz və minimum 3 simvol olmalıdır
-    @NotBlank(message = "Ad sahəsi boş ola bilməz.")
-    @Size(min = 3, max = 255, message = "Ad minimum 3, maksimum 255 simvol olmalıdır.")
+    @NotBlank(message = "Məhsul adı boş qala bilməz.")
+    @Size(min = 3, max = 100, message = "Ad 3-100 simvol olmalıdır.")
     private String name;
 
-    // Təsvir boş ola bilməz və minimum 10 simvol olmalıdır
-    @NotBlank(message = "Təsvir sahəsi boş ola bilməz.")
-    @Size(min = 10, max = 1000, message = "Təsvir minimum 10, maksimum 1000 simvol olmalıdır.")
+    @NotBlank(message = "Təsvir boş qala bilməz.")
+    @Size(max = 1000, message = "Təsvir 1000 simvoldan çox olmamalıdır.")
     private String description;
 
-    // Qiymət boş ola bilməz və minimum 0.01 olmalıdır
-    @NotNull(message = "Qiymət sahəsi boş ola bilməz.")
-    @DecimalMin(value = "0.01", message = "Qiymət ən azı 0.01 olmalıdır.")
+    @NotNull(message = "Qiymət daxil edilməlidir.")
+    @DecimalMin(value = "0.01", message = "Qiymət 0.01-dən çox olmalıdır.")
     private BigDecimal price;
 
-    // Brend adı boş ola bilməz
-    @NotBlank(message = "Brend adı boş ola bilməz.")
-    private String brand;
+    @NotNull(message = "Hazırlanma vaxtı daxil edilməlidir.")
+    @Min(value = 1, message = "Hazırlanma vaxtı ən azı 1 dəqiqə olmalıdır.")
+    private Integer preparationTime;
 
-    // Kateqoriya boş ola bilməz
     @NotBlank(message = "Kateqoriya seçilməlidir.")
     private String category;
 
-    // Həcm boş ola bilməz və minimum 1 olmalıdır
-    @NotNull(message = "Həcm sahəsi boş ola bilməz.")
-    @Min(value = 1, message = "Həcm ən azı 1 ml olmalıdır.")
-    private Integer volume;
+    /*
+     * SİLİNDİ:
+     * photoUrl
+     *
+     * Köhnə şəkil URL-i DTO-dan idarə edilməməlidir.
+     * Şəkil dəyişdirilmədikdə mövcud photoUrl Service-də saxlanılır.
+     * Şəkil dəyişdirildikdə yeni image Controller/Service vasitəsilə idarə olunur.
+     */
 
-    // Qoxu/Tərkib boş ola bilməz
-    @NotBlank(message = "Qoxu/Tərkib sahəsi boş ola bilməz.")
-    private String scent;
-
-    private String photoUrl; // Köhnə şəkil URL-i
 }
