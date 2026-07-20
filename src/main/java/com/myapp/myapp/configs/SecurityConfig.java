@@ -5,14 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; //Tehlukesiz sifreleme ucun
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
@@ -22,71 +17,71 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                //1: Session xətasını aradan qaldırır və Front-end POST formalarını idarə edir.
+                // 1: CSRF Qorumasının Tənzimlənməsi
                 .csrf(csrf -> csrf
-                        // Front-end formalarının CSRF qorumasını bağlayır:
-                        // /contact və /book-a-table formaları POST sorğusu ilə işlədiyi üçün mütləq ignore edilməlidir.
-                        .ignoringRequestMatchers("/contact", "/book-a-table")
-                        // Qalan POST sorğuları üçün (məsələn, /admin login) tokeni kukidə saxlayır.
+                        // DÜZƏLDİLDİ: Müştərinin POST etdiyi API yolları da bura əlavə olundu.
+                        // Əgər /api/orders ignore edilməsəydi, front-end-dən sifariş keçəndə 403 Forbidden xətası verərdi.
+                        .ignoringRequestMatchers(
+                                "/contact",
+                                "/book-a-table",
+                                "/api/orders",
+                                "/api/orders/create-payment"
+                        )
+                        // Qalan POST sorğuları (məsələn, admin login paneli) üçün CSRF tokeni kukidə saxlayır.
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
 
+                // 2: Keçid İcazələri (Sıralama Çox Vacibdir!)
                 .authorizeHttpRequests(auth -> auth
-                        //2 Bu iki formanın hər kəs tərəfindən istifadə edilməsinə icazə verir.
-                        // Sifariş Et (book-a-table) və Əlaqə (contact) POST sorğuları
+                        // Sifariş Et, Əlaqə və API sifariş POST sorğularına hər kəs üçün icazə verilir
                         .requestMatchers(HttpMethod.POST, "/contact").permitAll()
                         .requestMatchers(HttpMethod.POST, "/book-a-table").permitAll()
-
-                        // ELAVE EDILDI: Müştəri yeni sifariş yarada bilər (səbətə əlavə/checkout)
                         .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
-                        // ELAVE EDILDI: Müştəri öz səbətinə baxa bilər (bu qayda GET /api/orders/* qaydasından ƏVVƏL olmalıdır,
-                        // əks halda aşağıdakı "/api/orders/*" ADMIN qaydası "cart"-ı da tutub bloklayar)
-                        .requestMatchers(HttpMethod.GET, "/api/orders/cart").permitAll()
-                        // ELAVE EDILDI: Ödəniş başlatma da müştəri üçün açıq qalır
                         .requestMatchers(HttpMethod.POST, "/api/orders/create-payment").permitAll()
 
-                        // ELAVE EDILDI: Bütün sifarişlərin siyahısı (müştəri adı/email/telefon daxil)
-                        // əvvəllər QORUNMURDU - istənilən kəs bu linkə girib bütün məlumatları görə bilərdi.
-                        // İndi yalnız daxil olmuş admin baxa bilər.
+                        // Müştəri öz səbətinə baxa bilər (Hər kəsə açıqdır)
+                        // Qeyd: Bu qayda aşağıdakı /api/orders/** qaydasından mütləq ƏVVƏL gəlməlidir!
+                        .requestMatchers(HttpMethod.GET, "/api/orders/cart").permitAll()
+
+                        // DÜZƏLDİLDİ: Bütün sifarişlərin siyahısı və detalları yalnız ADMIN rolu olanlar üçün.
+                        // '/*' yerinə '/**' yazıldı ki, alt linklər (məsələn: /api/orders/detail/5) tam qorunsun.
                         .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
-                        // ELAVE EDILDI: ID ilə tək sifarişə baxmaq da eyni səbəbdən yalnız admin üçün
-                        .requestMatchers(HttpMethod.GET, "/api/orders/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").hasRole("ADMIN")
 
-                        // Qayda 3 Admin ilə başlayan hər şeyə yalnız daxil olan istifadəçilər baxa bilər
-                        .requestMatchers("/admin/**").authenticated()
+                        // DÜZƏLDİLDİ: /admin ilə başlayan bütün səhifələrə yalnız daxil olmuş ADMIN rolu olanlar girə bilər.
+                        // Əvvəl .authenticated() idi, yəni gələcəkdə "USER" rolu əlavə etsən o da girə bilərdi. İndi tam bağlandı.
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // Qayda 4 Bütün digər yollara (frontend səhifələri, CSS/JS/şəkillər) icazə ver
+                        // Qalan bütün digər yollara (Ana səhifə, məhsullar, CSS, JS, şəkillər) icazə ver
                         .anyRequest().permitAll()
                 )
+                // 3: Giriş (Login) Tənzimləmələri
                 .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/admin/products", true)
+                        .loginPage("/login") // Custom login səhifəmizin yolu
+                        .defaultSuccessUrl("/admin/products", true) // Login uğurlu olduqda yönləndiriləcək səhifə
                         .permitAll()
                 )
+                // 4: Çıxış (Logout) Tənzimləmələri
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
+                        .logoutSuccessUrl("/") // Çıxış etdikdən sonra ana səhifəyə göndərir
                         .permitAll()
                 );
         return http.build();
     }
 
     /**
-     * UPDATED: Audit telebi - NoOpPasswordEncoder evezine BCrypt istifade olunur.
-     * Bu, parollarin bazada ve ya yaddasda aciq sekilde qalmasinin qarsisini alir.
+     * Parolların təhlükəsiz şəkildə heşlənməsi (şifrələnməsi) üçün BCrypt istifadə olunur.
+     * Bizim yaratdığımız CustomUserDetailsService bazadan parolu yoxlayarkən bu beandan istifadə edəcək.
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    @Bean
-    public UserDetailsService userDetailsService() {
-        // InMemoryUserDetailsManager ucun parol tehlukesiz haldadir
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password("$2b$10$2koYND9BQvZlXrzUempCyO4BqOcCzBCU0wgRJYAVmSzBA/lZV5oYq")
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(admin);
-    }
+
+    // =========================================================================
+    // SİLİNDİ: @Bean public UserDetailsService userDetailsService() metodu.
+    // Artıq koda sabit yazılmış admin istifadəçisinə ehtiyac yoxdur.
+    // Spring Boot bizim yazdığımız CustomUserDetailsService sinfini avtomatik tanıyacaq.
+    // =========================================================================
 }
