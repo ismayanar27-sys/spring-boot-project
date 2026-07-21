@@ -31,4 +31,6 @@ public interface OrderService {
     // panelində "son ödənilən sifariş" göstərmək üçün) bu, əlavə bir
     // getOrderById() sorğusu yazmadan əlimizdə olacaq.
     OrderDto confirmPaymentByTransactionId(String transactionId, boolean success);
+
+    Object countOrders();
 }

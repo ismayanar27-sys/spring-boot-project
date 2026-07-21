@@ -241,4 +241,9 @@ public class OrderServiceImpl implements OrderService {
         return null;
     }
 
+    @Override
+    public Object countOrders() {
+        return null;
+    }
+
 }
