@@ -9,7 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -22,7 +24,7 @@ public class ReservationServiceImpl implements ReservationService {
     @Value("${admin.email.recipient:ismayanar27@gmail.com}")
     private String adminEmailRecipient;
 
-    //Restaurantın maksimum tutumu.
+    // Restaurantın maksimum tutumu.
     // application.properties-də restaurant.capacity ilə dəyişdirilə bilər.
     @Value("${restaurant.capacity:50}")
     private int restaurantCapacity;
@@ -67,8 +69,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         // Restaurant capacity yoxlanılır.
-        // eyni tarix və saat üzrə aktiv reservation-lar
-        // database-dən gətirilir.
+        // Eyni tarix və saat üzrə aktiv reservation-lar database-dən gətirilir.
         int reservedPeople = reservationRepository
                 .findByReservationDateAndReservationTimeAndStatusNot(
                         reservation.getReservationDate(),
@@ -93,8 +94,7 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         // Rezervasiyanı bazaya yazırıq
-        Reservation savedReservation =
-                reservationRepository.save(reservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
 
         // Rezervasiya bazaya yazıldıqdan sonra adminə bildiriş göndəririk
         sendAdminNotification(savedReservation);
@@ -105,6 +105,7 @@ public class ReservationServiceImpl implements ReservationService {
     private void sendAdminNotification(Reservation reservation) {
 
         try {
+
             final String subject =
                     "Yeni rezervasiya: " + reservation.getName();
 
@@ -145,18 +146,83 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     /**
-     * Bazadakı bütün rezervasiyaların sayını qaytarır.
+     * Bazadakı bütün aktiv rezervasiyaların sayını qaytarır.
      */
     @Override
     @Transactional(readOnly = true)
     public long countReservations() {
 
-        //Yalnız aktiv reservation-lar sayılır.
         return reservationRepository.findAll()
                 .stream()
                 .filter(reservation ->
                         reservation.getStatus() != ReservationStatus.CANCELLED
                 )
                 .count();
+    }
+
+    /**
+     * Admin panel üçün bütün rezervasiyaları qaytarır.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Reservation> getAllReservations() {
+
+        return reservationRepository.findAll();
+    }
+
+    /**
+     * ID-yə görə rezervasiya gətirir.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Reservation getReservationById(Long id) {
+
+        return reservationRepository.findById(id)
+                .orElse(null);
+    }
+
+    /**
+     * Statusa görə rezervasiyaları filter edir.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Reservation> getReservationsByStatus(ReservationStatus status) {
+
+        return reservationRepository.findAll()
+                .stream()
+                .filter(reservation ->
+                        reservation.getStatus() == status
+                )
+                .toList();
+    }
+
+    /**
+     * Admin paneldən reservation statusunu dəyişir.
+     */
+    @Override
+    @Transactional
+    public boolean updateReservationStatus(
+            Long id,
+            ReservationStatus status
+    ) {
+
+        Reservation reservation = reservationRepository.findById(id)
+                .orElse(null);
+
+        if (reservation == null) {
+            return false;
+        }
+
+        reservation.setStatus(status);
+
+        reservationRepository.save(reservation);
+
+        log.info(
+                "Reservation status yeniləndi. ID={}, Status={}",
+                id,
+                status
+        );
+
+        return true;
     }
 }

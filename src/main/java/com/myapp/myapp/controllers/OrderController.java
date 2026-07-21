@@ -3,7 +3,9 @@ package com.myapp.myapp.controllers;
 import com.myapp.myapp.dtos.OrderCreateDto;
 import com.myapp.myapp.dtos.OrderDto;
 import com.myapp.myapp.services.OrderService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ public class OrderController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<OrderDto> createOrder(@RequestBody OrderCreateDto orderCreateDto, HttpSession session) {
+    public ResponseEntity<OrderDto> createOrder(@Valid @RequestBody OrderCreateDto orderCreateDto, HttpSession session) {
         OrderDto createdOrder = orderService.createOrder(orderCreateDto);
         // Yeni sifariş yaradılanda, ID-ni bu istifadəçinin sessiyasında saxlayır.
         session.setAttribute(CART_SESSION_KEY, createdOrder.getId());
@@ -51,7 +53,19 @@ public class OrderController {
     @GetMapping("/cart")
     public String viewCart(Model model, HttpSession session) {
         Long currentOrderId = (Long) session.getAttribute(CART_SESSION_KEY);
-        OrderDto order = currentOrderId != null ? orderService.getOrderById(currentOrderId) : null;
+        OrderDto order = null;
+
+        // DÜZƏLDİLDİ: getOrderById tapmadıqda null yox, EntityNotFoundException atır.
+        // Əvvəlki kodda bu exception tutulmurdu və istifadəçi 500 səhifəsinə düşürdü.
+        if (currentOrderId != null) {
+            try {
+                order = orderService.getOrderById(currentOrderId);
+            } catch (EntityNotFoundException e) {
+                // Sifariş artıq mövcud deyil (silinib və s.) - sakitcə boş səbət göstəririk
+                session.removeAttribute(CART_SESSION_KEY);
+            }
+        }
+
         if (order != null) {
             model.addAttribute("order", order);
         } else {
@@ -62,10 +76,14 @@ public class OrderController {
 
     @PostMapping("/create-payment")
     public String createPayment(@RequestParam("orderId") Long orderId) {
-        OrderDto order = orderService.getOrderById(orderId);
-        if (order == null) {
+        // DÜZƏLDİLDİ: eyni səbəbdən try-catch əlavə olundu.
+        OrderDto order;
+        try {
+            order = orderService.getOrderById(orderId);
+        } catch (EntityNotFoundException e) {
             return "redirect:/api/orders/cart";
         }
+
         // Bu, sadəcə demo redirect-dir - real Portmanat inteqrasiyası
         // (signature/hash) və server-to-server callback tələb edir.
         String paymentUrl = "https://www.portmanat.az/az/pay" +

@@ -63,6 +63,12 @@ public class Order {
     @Column(nullable = false)
     private String paymentMethod;
 
+    // Ödəniş provayderinə (Portmanat) göndərilən unikal əməliyyat ID-si.
+    // Callback qayıdanda məhz bu ID vasitəsilə hansı sifarişə aid olduğunu tapırıq.
+    // nullable=true, çünki sifariş yaradılan anda hələ ödənişə keçilməmiş ola bilər.
+    @Column(unique = true)
+    private String transactionId;
+
     // Sifarişə daxil olan məhsullar
     @OneToMany(
             mappedBy = "order",
@@ -91,5 +97,4 @@ public class Order {
         orderItems.remove(orderItem);
         orderItem.setOrder(null);
     }
-
 }

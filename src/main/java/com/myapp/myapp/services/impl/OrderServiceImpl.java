@@ -231,4 +231,14 @@ public class OrderServiceImpl implements OrderService {
         return mapToDto(updatedOrder);
     }
 
+    @Override
+    public OrderDto attachTransactionId(Long orderId, String transactionId) {
+        return null;
+    }
+
+    @Override
+    public OrderDto confirmPaymentByTransactionId(String transactionId, boolean success) {
+        return null;
+    }
+
 }

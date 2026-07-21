@@ -43,13 +43,20 @@ public class SecurityConfig {
                         // Qeyd: Bu qayda aşağıdakı /api/orders/** qaydasından mütləq ƏVVƏL gəlməlidir!
                         .requestMatchers(HttpMethod.GET, "/api/orders/cart").permitAll()
 
-                        // DÜZƏLDİLDİ: Bütün sifarişlərin siyahısı və detalları yalnız ADMIN rolu olanlar üçün.
-                        // '/*' yerinə '/**' yazıldı ki, alt linklər (məsələn: /api/orders/detail/5) tam qorunsun.
+                        // Ödəniş nəticə səhifələri (uğurlu/uğursuz) də hər kəsə
+                        // açıq olmalıdır. Əks halda müştəri ödənişdən sonra bu səhifəyə
+                        // yönləndiriləndə "/api/orders/**" qaydasına düşüb ADMIN login
+                        // səhifəsinə atılardı - müştəri heç vaxt nəticəni görməzdi.
+                        // Bu qaydalar da aşağıdakı /api/orders/** qaydasından ƏVVƏL gəlməlidir!
+                        .requestMatchers(HttpMethod.GET, "/api/orders/checkout/success").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/orders/checkout/failure").permitAll()
+
+                        // Bütün sifarişlərin siyahısı və detalları yalnız ADMIN rolu olanlar üçün.
+                        // '/*' yerinə '/**' yazıldı ki, alt linklər (məsələn: /api/orders/detail/5) tam qorunsun
                         .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/orders/**").hasRole("ADMIN")
 
-                        // DÜZƏLDİLDİ: /admin ilə başlayan bütün səhifələrə yalnız daxil olmuş ADMIN rolu olanlar girə bilər.
-                        // Əvvəl .authenticated() idi, yəni gələcəkdə "USER" rolu əlavə etsən o da girə bilərdi. İndi tam bağlandı.
+                        // /admin ilə başlayan bütün səhifələrə yalnız daxil olmuş ADMIN rolu olanlar girə bilər
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // Qalan bütün digər yollara (Ana səhifə, məhsullar, CSS, JS, şəkillər) icazə ver
@@ -69,19 +76,8 @@ public class SecurityConfig {
                 );
         return http.build();
     }
-
-    /**
-     * Parolların təhlükəsiz şəkildə heşlənməsi (şifrələnməsi) üçün BCrypt istifadə olunur.
-     * Bizim yaratdığımız CustomUserDetailsService bazadan parolu yoxlayarkən bu beandan istifadə edəcək.
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    // =========================================================================
-    // SİLİNDİ: @Bean public UserDetailsService userDetailsService() metodu.
-    // Artıq koda sabit yazılmış admin istifadəçisinə ehtiyac yoxdur.
-    // Spring Boot bizim yazdığımız CustomUserDetailsService sinfini avtomatik tanıyacaq.
-    // =========================================================================
 }

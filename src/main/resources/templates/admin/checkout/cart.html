@@ -7,7 +7,8 @@
 <body>
 
 <h1>Sifariş Məlumatları</h1>
-  th:if="${order}">
+
+<div th:if="${order}">
     <p>Sifariş ID-si: <span th:text="${order.id}"></span></p>
     <p>Ümumi Məbləğ: <span th:text="${order.totalAmount}"></span> AZN</p>
 
@@ -18,7 +19,7 @@
 </div>
 
 <div th:unless="${order}">
-    <p>Səbətinizdə sifariş yoxdur.</p>
+    <p th:text="${message} ?: 'Səbətinizdə sifariş yoxdur.'"></p>
 </div>
 
 </body>
