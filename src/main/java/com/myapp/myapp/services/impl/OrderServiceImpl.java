@@ -184,9 +184,9 @@ public class OrderServiceImpl implements OrderService {
             String subject = "Sifariş təsdiqi! #" + order.getId();
 
             String body = String.format(
-                    "Hörmətli %s,\n\n"
+                    "Hörmətli %s,<br><br>"
                             + "Sifarişiniz (%s AZN) uğurla qəbul edildi. "
-                            + "Tezliklə sizinlə əlaqə saxlayacağıq.\n\n"
+                            + "Tezliklə sizinlə əlaqə saxlayacağıq.<br><br>"
                             + "Sifariş ID: %d",
 
                     order.getCustomerName(),
@@ -242,7 +242,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Object countOrders() {
+    public Long countOrders() {
         return null;
     }
 

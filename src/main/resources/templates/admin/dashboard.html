@@ -35,6 +35,40 @@
     </form>
 
   </div>
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h3 class="fw-bold mb-0" th:text="${productCount}">0</h3>
+          <p class="text-muted mb-0">Məhsul</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h3 class="fw-bold mb-0" th:text="${clientCount}">0</h3>
+          <p class="text-muted mb-0">Müştəri</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h3 class="fw-bold mb-0" th:text="${reservationCount}">0</h3>
+          <p class="text-muted mb-0">Rezervasiya</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h3 class="fw-bold mb-0" th:text="${orderCount}">0</h3>
+          <p class="text-muted mb-0">Sifariş</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Cards -->
   <div class="row g-4">
@@ -116,7 +150,9 @@
             Menyunu idarə et
           </p>
 
-          <a th:href="@{/admin/menu}"
+
+               idarəetməsi "/admin/products" ünvanındadır (ProductController)
+          <a th:href="@{/admin/products}"
              class="btn btn-warning w-100">
 
             Aç
@@ -198,11 +234,9 @@
           <th>Security</th>
           <td>Spring Security</td>
         </tr>
-
       </table>
 
     </div>
-
   </div>
 
 </div>

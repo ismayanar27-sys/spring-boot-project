@@ -4,9 +4,11 @@ import com.myapp.myapp.dtos.ClientDtos.ClientCreateDto;
 import com.myapp.myapp.dtos.ClientDtos.ClientDto;
 import com.myapp.myapp.dtos.ClientDtos.ClientUpDateDto;
 import com.myapp.myapp.services.ClientService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -62,8 +64,15 @@ public class ClientController {
     }
 
     @PostMapping("/add")
-    public String addClient(@ModelAttribute ClientCreateDto clientCreateDto,
+    public String addClient(@Valid @ModelAttribute("clientCreateDto") ClientCreateDto clientCreateDto,
+                            BindingResult bindingResult,
                             RedirectAttributes redirectAttributes) {
+        // @NotBlank/@Email annotasiyaları bunsuz heç vaxt işə düşmürdü -
+        // boş adla/email-lə müştəri əlavə etmək mümkün idi.
+        if (bindingResult.hasErrors()) {
+            log.warn("Müştəri əlavə edilərkən validasiya xətası baş verdi.");
+            return "admin/clients/client-add";
+        }
         clientService.createClients(clientCreateDto);
         redirectAttributes.addFlashAttribute("successMessage", "Müştəri uğurla əlavə edildi!");
         return "redirect:/admin/clients";
@@ -85,8 +94,13 @@ public class ClientController {
 
     @PostMapping("/update/{id}")
     public String updateClient(@PathVariable Long id,
-                               @ModelAttribute ClientUpDateDto clientUpDateDto,
+                               @Valid @ModelAttribute("clientUpDateDto") ClientUpDateDto clientUpDateDto,
+                               BindingResult bindingResult,
                                RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            log.warn("Müştəri yenilənərkən validasiya xətası baş verdi. ID={}", id);
+            return "admin/clients/client-update";
+        }
         //true/false nəticəsi yoxlanılır - əvvəl "uğurlu" yazılırdı, müştəri tapılmasa belə
         boolean updated = clientService.updateClients(clientUpDateDto, id);
         if (updated) {
@@ -101,7 +115,6 @@ public class ClientController {
     @PostMapping("/delete/{id}")
     public String deleteClient(@PathVariable Long id,
                                RedirectAttributes redirectAttributes) {
-        //eyni məntiqlə boolean yoxlanılır
         boolean deleted = clientService.deleteClients(id);
         if (deleted) {
             redirectAttributes.addFlashAttribute("successMessage", "Müştəri uğurla silindi!");

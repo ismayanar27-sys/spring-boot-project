@@ -24,13 +24,12 @@ public interface OrderService {
 
     // Ödəniş provayderindən (Portmanat) gələn callback-i emal edir:
     // transactionId-yə görə sifarişi tapır və nəticəyə uyğun statusunu
-    // PAID və ya FAILED edir.
-    //
-    // QEYD: "void" yox, "OrderDto" qaytarır - hazırda PaymentController bu
+    // PAID və ya FAILED edir
+    //  "void" yox, "OrderDto" qaytarır - hazırda PaymentController bu
     // qaytarılan dəyəri istifadə etmir, amma gələcəkdə (məsələn admin
     // panelində "son ödənilən sifariş" göstərmək üçün) bu, əlavə bir
     // getOrderById() sorğusu yazmadan əlimizdə olacaq.
     OrderDto confirmPaymentByTransactionId(String transactionId, boolean success);
 
-    Object countOrders();
+    Long countOrders();
 }

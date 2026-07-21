@@ -36,9 +36,8 @@ public class AdminReservationController {
                 reservationService.getAllReservations()
         );
 
-        return "admin/reservations/reservations";
+        return "admin/reservations/reservation-list";
     }
-
     /**
      * Seçilmiş rezervasiyanın bütün məlumatlarını göstərir.
      */
@@ -72,7 +71,7 @@ public class AdminReservationController {
                 reservation
         );
 
-        return "admin/reservations/reservation-details";
+        return "admin/reservations/reservation";
     }
 
     /**
@@ -99,9 +98,8 @@ public class AdminReservationController {
                 status
         );
 
-        return "admin/reservations/reservations";
+        return "admin/reservations/reservation-list";
     }
-
     /**
      * Admin rezervasiyanın statusunu dəyişə bilər.
      */
@@ -148,5 +146,4 @@ public class AdminReservationController {
 
         return "redirect:/admin/reservations";
     }
-
 }
