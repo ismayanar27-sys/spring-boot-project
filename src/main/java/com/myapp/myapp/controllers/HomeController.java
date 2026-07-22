@@ -40,8 +40,6 @@ public class HomeController {
         long workerCount = productService.countProducts();
         model.addAttribute("workerCount", workerCount); // HTML-də 'workerCount' adı ilə istifadə olunur.
 
-        // --- DİGƏR MƏLUMATLAR ---
-
         // Rezervasiya forması üçün boş DTO obyektini Modelə əlavə edir.
         if (!model.containsAttribute("reservationDTO")) {
             model.addAttribute("reservationDTO", new ReservationDTO());

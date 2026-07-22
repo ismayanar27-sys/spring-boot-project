@@ -80,7 +80,6 @@ public class ClientController {
 
     @GetMapping("/edit/{id}")
     public String editClientForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
-        //try-catch - eyni menteqle
         try {
             ClientUpDateDto clientUpDateDto = clientService.findClientById(id);
             model.addAttribute("clientUpDateDto", clientUpDateDto);

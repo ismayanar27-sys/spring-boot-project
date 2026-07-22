@@ -146,28 +146,38 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     /**
-     * Bazadakı bütün aktiv rezervasiyaların sayını qaytarır.
+     * Bazadakı bütün aktiv (CANCELLED olmayan) rezervasiyaların sayını qaytarır.
+     *
+     * DÜZƏLDİLDİ: Əvvəlki versiyada `findAll()` ilə BÜTÜN cədvəl yaddaşa
+     * çəkilib, sonra Java tərəfində `.stream().filter(...).count()` ilə
+     * sayılırdı. Bu, yalnız bir ədəd lazım olan yerdə bütün sətirləri
+     * (adları, telefonları, mesajları və s.) lüzumsuz yerə bazadan çəkir.
+     *
+     * SİLİNDİ: reservationRepository.findAll().stream().filter(r -> r.getStatus() != ReservationStatus.CANCELLED).count()
+     *
+     * ƏVƏZİNƏ: `ReservationRepository.countByStatusNot(...)` istifadə olunur -
+     * bu, bazada birbaşa "SELECT COUNT(*) ... WHERE status <> ?" işlədir.
      */
     @Override
     @Transactional(readOnly = true)
     public long countReservations() {
 
-        return reservationRepository.findAll()
-                .stream()
-                .filter(reservation ->
-                        reservation.getStatus() != ReservationStatus.CANCELLED
-                )
-                .count();
+        return reservationRepository.countByStatusNot(ReservationStatus.CANCELLED);
     }
 
     /**
      * Admin panel üçün bütün rezervasiyaları qaytarır.
+     *
+     * DÜZƏLDİLDİ: `findAll()` (sıralanmamış) əvəzinə `findAllByOrderByCreatedAtDesc()`
+     * istifadə olunur ki, admin panelində ən yeni rezervasiyalar yuxarıda görünsün.
+     *
+     * SİLİNDİ: reservationRepository.findAll();
      */
     @Override
     @Transactional(readOnly = true)
     public List<Reservation> getAllReservations() {
 
-        return reservationRepository.findAll();
+        return reservationRepository.findAllByOrderByCreatedAtDesc();
     }
 
     /**
@@ -183,17 +193,23 @@ public class ReservationServiceImpl implements ReservationService {
 
     /**
      * Statusa görə rezervasiyaları filter edir.
+     *
+     * DÜZƏLDİLDİ: Əvvəlki versiyada `findAll()` ilə BÜTÜN cədvəl yaddaşa
+     * çəkilib, sonra Java tərəfində `.stream().filter(...)` ilə statusa
+     * görə süzülürdü - filtrasiya bazanın WHERE şərti (indeksli sütun
+     * üzərində) əvəzinə tətbiqin özündə, indekssiz şəkildə aparılırdı.
+     *
+     * SİLİNDİ: reservationRepository.findAll().stream().filter(r -> r.getStatus() == status).toList()
+     *
+     * ƏVƏZİNƏ: artıq mövcud olan `ReservationRepository.findByStatus(status)`
+     * metodu istifadə olunur - filtrasiya birbaşa SQL-in WHERE şərti ilə,
+     * bazanın özündə aparılır.
      */
     @Override
     @Transactional(readOnly = true)
     public List<Reservation> getReservationsByStatus(ReservationStatus status) {
 
-        return reservationRepository.findAll()
-                .stream()
-                .filter(reservation ->
-                        reservation.getStatus() == status
-                )
-                .toList();
+        return reservationRepository.findByStatus(status);
     }
 
     /**

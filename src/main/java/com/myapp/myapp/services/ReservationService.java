@@ -21,7 +21,7 @@ public interface ReservationService {
     long countReservations();
 
     // ================================
-    // ƏLAVƏ EDİLDİ: Admin Panel üçün
+    // Admin Panel üçün
     // ================================
 
     // Bütün rezervasiyaları ən yeni tarixə görə qaytarır.

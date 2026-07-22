@@ -15,8 +15,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // Spring Data JPA bizə bazada məlumatı saxlamaq, tapmaq və silmək üçün
     // bütün metodları (məsələn: save(), findAll()) avtomatik yaradır.
 
-    // Eyni tarix və saat üzrə yalnız aktiv reservation-ları gətirir.
-    // CANCELLED reservation-lar capacity hesablamasına daxil edilmir.
+    // Eyni tarix və saat üzrə yalnız aktiv reservation-ları gətirir
+    // CANCELLED reservation-lar capacity hesablamasına daxil edilmir
     List<Reservation> findByReservationDateAndReservationTimeAndStatusNot(
             LocalDate reservationDate,
             LocalTime reservationTime,
@@ -28,4 +28,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     // Admin panelində ən yeni rezervasiyaları yuxarıda göstərmək üçün.
     List<Reservation> findAllByOrderByCreatedAtDesc();
+
+    long countByStatusNot(ReservationStatus reservationStatus);
 }

@@ -38,9 +38,6 @@ public class EmailService {
     // Java obyektlərini JSON mətninə çevirmək üçün (Brevo-ya JSON formatında sorğu göndərməliyik)
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Brevo panelində yaratdığın API açarı. application.properties-dəki
-    // brevo.api-key=${BREVO_API_KEY} sətrindən, oradan da IntelliJ/Render-in
-    // environment variable-larından oxunur. Kodda heç vaxt açıq yazılmır.
     @Value("${brevo.api-key}")
     private String brevoApiKey;
 

@@ -3,15 +3,14 @@ package com.myapp.myapp.controllers;
 import com.myapp.myapp.dtos.ContactDTO;
 import com.myapp.myapp.services.ContactService;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j; // ELAVE EDILDI: Loglama ucun
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.BindingResult;
 import org.springframework.http.MediaType;
-
 @Controller
-@Slf4j // ELAVE EDILDI: Audit ucun loglama aktiv edildi
+@Slf4j
 public class ContactController {
 
     private final ContactService contactService;

@@ -11,16 +11,11 @@ import com.myapp.myapp.repositories.OrderRepository;
 import com.myapp.myapp.repositories.ProductRepository;
 import com.myapp.myapp.services.EmailService;
 import com.myapp.myapp.services.OrderService;
-
 import jakarta.persistence.EntityNotFoundException;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.modelmapper.ModelMapper;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -231,16 +226,6 @@ public class OrderServiceImpl implements OrderService {
         return mapToDto(updatedOrder);
     }
 
-    /**
-     * DÜZƏLDİLDİ: Bu metod "return null;" edən boş stub idi - yəni
-     * ödənişə keçərkən transactionId heç vaxt sifarişə yazılmırdı.
-     * Nəticədə Portmanat callback qayıdanda confirmPaymentByTransactionId()
-     * heç bir sifariş tapa bilmirdi - bütün ödəniş axını sınıq idi.
-     *
-     * SİLİNDİ: public OrderDto attachTransactionId(Long orderId, String transactionId) { return null; }
-     *
-     * ƏVƏZİNƏ: sifariş tapılır, transactionId sahəsinə yazılır və saxlanılır.
-     */
     @Override
     @Transactional
     public OrderDto attachTransactionId(Long orderId, String transactionId) {
@@ -259,14 +244,7 @@ public class OrderServiceImpl implements OrderService {
         return mapToDto(savedOrder);
     }
 
-    /**
-     * DÜZƏLDİLDİ: Bu metod da "return null;" edən boş stub idi - Portmanat-dan
-     * callback gəlsə belə, sifarişin statusu heç vaxt PAID/FAILED olmurdu,
-     * həmişəlik PENDING qalırdı.
-     *
-     * SİLİNDİ: public OrderDto confirmPaymentByTransactionId(String transactionId, boolean success) { return null; }
-     *
-     * ƏVƏZİNƏ: transactionId-yə görə sifariş tapılır, nəticəyə uyğun status
+    /**transactionId-yə görə sifariş tapılır, nəticəyə uyğun status
      * yenilənir. Callback ikinci dəfə gəlsə (provayderlər bəzən eyni
      * callback-i təkrar göndərir), status artıq PAID-dirsə təkrar dəyişmirik -
      * bu, "idempotency" təmin edir.

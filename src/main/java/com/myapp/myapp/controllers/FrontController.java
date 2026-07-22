@@ -41,7 +41,4 @@ public class FrontController {
         // Şablon yolu: templates/front/chefs.html
         return "front/chefs";
     }
-
-    // Qeyd: /contact mapinqi (FrontController-da olan) məsuliyyətinə görə ContactController-a köçürülmüşdür.
-    // Bu, hər bir Kontrollerin yalnız bir işlə məşğul olmasını təmin edir.
 }

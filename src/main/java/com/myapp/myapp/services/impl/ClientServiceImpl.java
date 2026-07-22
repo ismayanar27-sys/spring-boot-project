@@ -91,11 +91,6 @@ public class ClientServiceImpl implements ClientService {
         // Boşluqları silir və axtarış sözünü kiçik hərflərə çevirir ki, axtarış düzgün işləsin.
         String trimmedKeyword = keyword.trim().toLowerCase();
 
-        // DÜZƏLDİLDİ: Metod adı "IgnoreCase" versiyasına dəyişdi. Köhnə
-        // (case-sensitive) metod bazadakı adlar fərqli registrdə yazılıbsa
-        // (məsələn "Anar" axtarışda, "anar" bazada) nəticə tapmırdı.
-        // SİLİNDİ: clientRepository.findByNameContainingOrEmailContainingOrDescriptionContaining(trimmedKeyword, trimmedKeyword, trimmedKeyword);
-        // Axtarış adı, email və ya təsviri əhatə edir (böyük/kiçik hərfə həssas deyil).
         List<Client> clients = clientRepository.findByNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrDescriptionContainingIgnoreCase(trimmedKeyword, trimmedKeyword, trimmedKeyword);
 
         // Axtarış nəticəsində tapılan Client obyektlərini ClientDto siyahısına çevirir.

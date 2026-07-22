@@ -65,8 +65,8 @@ public class PaymentController {
      * KART HAZIR OLMAYANDA: secretKey boşdur -> yoxlama avtomatik keçir, log-a
      * xəbərdarlıq yazılır, sistem normal işləməyə davam edir.
      *
-     * KART HAZIR OLANDA EDƏCƏYİN İŞ:
-     * 1) Render-də PORTMANAT_SECRET_KEY environment variable-ını təyin et.
+     * KART HAZIR OLANDA İŞ:
+     * 1) Render-də PORTMANAT_SECRET_KEY environment variable-ını təyin eDILIR.
      * 2) Portmanat-ın rəsmi sənədlərinə bax - onlar HANSI sahələri (status,
      *    transactionId, amount və s.), HANSI SIRAYLA və HANSI hash alqoritmi
      *    ilə imzalayır. Aşağıdakı "payload" sətrini elə buna uyğun dəyiş.
