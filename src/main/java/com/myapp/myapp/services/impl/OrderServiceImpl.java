@@ -231,19 +231,82 @@ public class OrderServiceImpl implements OrderService {
         return mapToDto(updatedOrder);
     }
 
+    /**
+     * DÜZƏLDİLDİ: Bu metod "return null;" edən boş stub idi - yəni
+     * ödənişə keçərkən transactionId heç vaxt sifarişə yazılmırdı.
+     * Nəticədə Portmanat callback qayıdanda confirmPaymentByTransactionId()
+     * heç bir sifariş tapa bilmirdi - bütün ödəniş axını sınıq idi.
+     *
+     * SİLİNDİ: public OrderDto attachTransactionId(Long orderId, String transactionId) { return null; }
+     *
+     * ƏVƏZİNƏ: sifariş tapılır, transactionId sahəsinə yazılır və saxlanılır.
+     */
     @Override
+    @Transactional
     public OrderDto attachTransactionId(Long orderId, String transactionId) {
-        return null;
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Sifariş tapılmadı, ID: " + orderId
+                        )
+                );
+
+        order.setTransactionId(transactionId);
+
+        Order savedOrder = orderRepository.save(order);
+
+        return mapToDto(savedOrder);
     }
 
+    /**
+     * DÜZƏLDİLDİ: Bu metod da "return null;" edən boş stub idi - Portmanat-dan
+     * callback gəlsə belə, sifarişin statusu heç vaxt PAID/FAILED olmurdu,
+     * həmişəlik PENDING qalırdı.
+     *
+     * SİLİNDİ: public OrderDto confirmPaymentByTransactionId(String transactionId, boolean success) { return null; }
+     *
+     * ƏVƏZİNƏ: transactionId-yə görə sifariş tapılır, nəticəyə uyğun status
+     * yenilənir. Callback ikinci dəfə gəlsə (provayderlər bəzən eyni
+     * callback-i təkrar göndərir), status artıq PAID-dirsə təkrar dəyişmirik -
+     * bu, "idempotency" təmin edir.
+     */
     @Override
+    @Transactional
     public OrderDto confirmPaymentByTransactionId(String transactionId, boolean success) {
-        return null;
+
+        Order order = orderRepository.findByTransactionId(transactionId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Bu transactionId-yə uyğun sifariş tapılmadı: " + transactionId
+                        )
+                );
+
+        if (order.getStatus() == OrderStatus.PAID) {
+            log.info(
+                    "Callback təkrar gəldi, sifariş artıq PAID statusundadır. Sifariş ID={}",
+                    order.getId()
+            );
+            return mapToDto(order);
+        }
+
+        order.setStatus(success ? OrderStatus.PAID : OrderStatus.FAILED);
+
+        Order savedOrder = orderRepository.save(order);
+
+        log.info(
+                "Ödəniş callback-i emal edildi. Sifariş ID={}, transactionId={}, yeni status={}",
+                savedOrder.getId(),
+                transactionId,
+                savedOrder.getStatus()
+        );
+
+        return mapToDto(savedOrder);
     }
 
     @Override
     public Long countOrders() {
-        return null;
+        return orderRepository.count();
     }
 
 }

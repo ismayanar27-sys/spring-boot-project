@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,8 +52,12 @@ public class OrderController {
     @GetMapping("/{id}")
     @ResponseBody
     public ResponseEntity<OrderDto> getOrderById(@PathVariable Long id) {
-        OrderDto order = orderService.getOrderById(id);
-        return ResponseEntity.ok(order);
+        try {
+            OrderDto order = orderService.getOrderById(id);
+            return ResponseEntity.ok(order);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @GetMapping("/cart")
@@ -191,4 +196,5 @@ public class OrderController {
         );
 
         return "admin/checkout/failure";
-    }}
+    }
+}
