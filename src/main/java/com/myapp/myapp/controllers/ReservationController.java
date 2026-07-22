@@ -3,11 +3,8 @@ package com.myapp.myapp.controllers;
 import com.myapp.myapp.dtos.ReservationDTO;
 import com.myapp.myapp.models.Reservation;
 import com.myapp.myapp.services.ReservationService;
-
 import jakarta.validation.Valid;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,7 +32,7 @@ public class ReservationController {
             BindingResult bindingResult
     ) {
 
-        // Validasiya xətalarını yoxlayırıq
+        // Validasiya xətalarını yoxlayır
         if (bindingResult.hasErrors()) {
 
             log.warn(
@@ -47,15 +44,15 @@ public class ReservationController {
 
         try {
 
-            // DTO-nu Entity obyektinə çeviririk
+            // DTO-nu Entity obyektinə çevirir
             Reservation reservation = mapDtoToEntity(reservationDTO);
 
-            // Rezervasiyanı yadda saxlayırıq
+            // Rezervasiyanı yadda saxlayır
             boolean reservationSaved =
                     reservationService.saveReservation(reservation);
 
             // Service artıq boolean qaytarır.
-            // false olduqda reservation qəbul edilmir.
+            // false olduqda reservation qəbul etmir.
             // Məsələn: restaurant capacity dolu ola bilər.
             if (!reservationSaved) {
 

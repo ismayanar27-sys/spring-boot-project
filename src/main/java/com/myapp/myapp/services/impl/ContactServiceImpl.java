@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +47,22 @@ public class ContactServiceImpl implements ContactService {
 
         return savedMessage;
     }
+
+    @Override
+    public List<Contact> getAllMessages() {
+        return List.of();
+    }
+
+    @Override
+    public boolean deleteMessage(Long id) {
+        return false;
+    }
+
+    @Override
+    public long countMessages() {
+        return 0;
+    }
+
     private void sendAdminNotification(Contact contact) {
         try {
             final String subject = "YENİ ƏLAQƏ MESAJI: " + contact.getSubject();

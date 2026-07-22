@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j; // Loglama üçün (System.out/err əvəzinə)
 import org.springframework.beans.factory.annotation.Value; // application.properties-dən dəyər oxumaq üçün
 import org.springframework.stereotype.Service;
-
 import java.net.URI;
 import java.net.http.HttpClient; // Java-nın öz daxili HTTP client-i - əlavə kitabxana lazım deyil
 import java.net.http.HttpRequest;
@@ -17,10 +16,9 @@ import java.time.Duration;
  *
  * ƏVVƏLKİ VERSİYA (SMTP/Gmail vasitəsilə) burada idi, amma dəyişdirildi, çünki:
  * Render.com kimi bəzi pulsuz hosting-lər SMTP portlarına (25, 465, 587) çıxışı
- * bloklayır - buna görə Gmail-ə mail göndərmə cəhdi "Connect timed out" xətası verirdi.
- *
+ * bloklayır - buna görə Gmail-ə mail göndərmə cəhdi "Connect timed out" xətası verirdi
  * YENİ VERSİYA: Brevo (əvvəlki adı Sendinblue) adlı email provayderinin HTTP API-sini
- * istifadə edir. HTTP (443 portu) bloklanmır, ona görə bu, problemi tam həll edir.
+ * istifadə edir. HTTP (443 portu) bloklanmır
  */
 @Service
 @Slf4j // Bu annotasiya avtomatik "log" adlı bir obyekt yaradır (log.info, log.error və LICENSE. üçün)

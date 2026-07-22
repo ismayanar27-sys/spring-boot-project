@@ -26,8 +26,6 @@ public class HomeController {
     @GetMapping({"/", "/index"})
     public String home(Model model) {
 
-        // --- DİNAMİK SAYĞACLAR (STATS) ÜÇÜN MƏLUMAT TOPLANMASI ---
-
         // 1. Clients Sayı: Bazadakı ümumi müştəri sayını gətirir.
         long clientCount = clientService.countClients();
         model.addAttribute("clientCount", clientCount);
