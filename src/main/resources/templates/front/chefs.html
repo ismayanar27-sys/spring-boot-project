@@ -2,18 +2,34 @@
 <html lang="az" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Aşpazlar | Yummy. Veb Saytınız</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aşpazlar | Restoran</title>
+
+    <!-- Essential CSS -->
+    <link th:href="@{/assets/img/favicon.png}" rel="icon">
+    <link th:href="@{/assets/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/bootstrap-icons/bootstrap-icons.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/aos/aos.css}" rel="stylesheet">
+    <link th:href="@{/assets/css/main.css}" rel="stylesheet">
+
     <style>
         .chefs-section {
-            padding: 80px 0;
+            padding: 120px 0 80px 0;
             background-color: #ffffff;
+            min-height: 80vh;
         }
         .chef-member {
             text-align: center;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            padding: 25px 20px;
+            background: #fff;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .chef-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
         .chef-member img {
             width: 150px;
@@ -21,66 +37,84 @@
             border-radius: 50%;
             object-fit: cover;
             margin-bottom: 15px;
-            border: 4px solid #ffb03c; /* Rənginizi tənzimləyin */
+            border: 4px solid #ffb03c;
         }
         .chef-member h4 {
             font-weight: 700;
             color: #333;
+            margin-bottom: 5px;
         }
         .chef-member span {
             display: block;
             font-size: 0.9em;
+            color: #ffb03c;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .chef-bio {
+            font-size: 0.9rem;
             color: #6c757d;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
     </style>
 </head>
 <body>
 
-<section id="chefs" class="chefs-section">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="display-5" style="color: #ffb03c;">Peşəkar Aşpazlarımız</h2>
-            <p class="text-muted">Bizim ləzzətli təamlarımızın arxasındakı yaradıcı beyinlər.</p>
+<header th:replace="~{front/fragments/header :: header}"></header>
+
+<main id="main">
+    <section id="chefs" class="chefs-section">
+        <div class="container">
+
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="display-5 fw-bold" style="color: #ffb03c;">Peşəkar Aşpazlarımız</h2>
+                <p class="text-muted">Bizim ləzzətli təamlarımızın arxasındakı yaradıcı beyinlər.</p>
+            </div>
+
+            <div class="row justify-content-center g-4">
+
+                <!-- Dinamik Aşpaz Siyahısı Dövrü -->
+                <div th:each="chef : ${chefs}"
+                     th:unless="${#lists.isEmpty(chefs)}"
+                     class="col-lg-4 col-md-6"
+                     data-aos="fade-up">
+
+                    <div class="chef-member h-100">
+                        <!-- Şəkil Yoxlaması (Null/Empty Fallback) -->
+                        <img th:src="${chef.photoUrl != null and !#strings.isEmpty(chef.photoUrl)} ? ${chef.photoUrl} : @{/assets/img/chefs/default-chef.jpg}"
+                             th:alt="${chef.fullName}"
+                             class="img-fluid">
+
+                        <h4 th:text="${chef.fullName}">Əli Əliyev</h4>
+                        <span th:text="${chef.position}">Baş Aşpaz</span>
+
+                        <p class="chef-bio" th:text="${chef.bio != null} ? ${chef.bio} : 'Məlumat daxil edilməyib.'">
+                            Aşpaz haqqında qısa bioqrafiya...
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Bazada Aşpaz Yoxdursa Göstəriləcək Mesaj -->
+                <div th:if="${chefs == null or #lists.isEmpty(chefs)}" class="col-12 text-center py-5">
+                    <i class="bi bi-people text-warning display-1 mb-3"></i>
+                    <h3 class="text-muted">Aşpaz məlumatı tapılmadı.</h3>
+                    <p class="text-secondary">Zəhmət olmasa Admin panelindən aşpaz məlumatlarını əlavə edin.</p>
+                </div>
+
+            </div>
         </div>
+    </section>
+</main>
 
-        <div class="row justify-content-center">
+<footer th:replace="~{front/fragments/footer :: footer}"></footer>
 
-            <div class="col-lg-4 col-md-6">
-                <div class="chef-member">
-                    <img th:src="@{/assets/img/chefs/chef-1.jpg}" alt="Aşpaz Nümunə 1" class="img-fluid">
-                    <h4>Əli Əliyev</h4>
-                    <span>Baş Aşpaz (Executive Chef)</span>
-                    <p>
-                        Əli Qafqaz və Aralıq dənizi mətbəxinin sirlərinə yiyələnib. 15 illik təcrübəsi ilə o, menyumuzun ruhudur.
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="chef-member">
-                    <img th:src="@{/assets/img/chefs/chef-2.jpg}" alt="Aşpaz Nümunə 2" class="img-fluid">
-                    <h4>Aynur Quliyeva</h4>
-                    <span>Şirniyyatçı Aşpaz (Pastry Chef)</span>
-                    <p>
-                        Aynur fransız şirniyyatları üzrə ixtisaslaşmışdır və bütün desertlərimizə öz incə toxunuşunu qatır.
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="chef-member">
-                    <img th:src="@{/assets/img/chefs/chef-3.jpg}" alt="Aşpaz Nümunə 3" class="img-fluid">
-                    <h4>Samir Vəliyev</h4>
-                    <span>Sous Chef</span>
-                    <p>
-                        Samir ənənəvi Azərbaycan mətbəxinin sadiq qalasıdır. O, milli təamların hazırlanmasında əvəzsizdir.
-                    </p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
+<!-- Essential JS -->
+<script th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/vendor/aos/aos.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
 
 </body>
 </html>

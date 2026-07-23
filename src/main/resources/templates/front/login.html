@@ -35,6 +35,11 @@
         </div>
 
         <form th:action="@{/login}" method="post">
+
+            <!--CSRF token - bunsuz admin girişinin özü belə  403 Forbidden ilə rədd edilə bilər, çünki Spring Security
+            formLogin da digər POST sorğuları kimi CSRF tələb edir. -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
             <div class="mb-3">
                 <label for="username" class="form-label">İstifadəçi Adı</label>
                 <input type="text" class="form-control" id="username" name="username" required>

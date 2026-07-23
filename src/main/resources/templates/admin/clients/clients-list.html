@@ -53,6 +53,7 @@
                 <div class="btn-group">
                     <a th:href="@{/admin/clients/edit/{id}(id=${client.id})}" class="btn btn-sm btn-warning">Düzəliş Et</a>
                     <form th:action="@{/admin/clients/delete/{id}(id=${client.id})}" method="post" style="display:inline;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Müştərini silmək istədiyinizə əminsiniz?');">Sil</button>
                     </form>
                 </div>

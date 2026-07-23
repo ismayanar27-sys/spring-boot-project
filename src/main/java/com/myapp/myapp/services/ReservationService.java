@@ -30,4 +30,6 @@ public interface ReservationService {
 
     // Admin rezervasiyanın statusunu dəyişə bilir
     boolean updateReservationStatus(Long id, ReservationStatus status);
+
+    Object countReservationsByStatus(ReservationStatus reservationStatus);
 }

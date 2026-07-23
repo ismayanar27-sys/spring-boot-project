@@ -30,4 +30,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findAllByOrderByCreatedAtDesc();
 
     long countByStatusNot(ReservationStatus reservationStatus);
+
+    //(Statistics üçün): statusa görə rezervasiya sayını birbaşa bazada hesablayır.
+    long countByStatus(ReservationStatus status);
 }

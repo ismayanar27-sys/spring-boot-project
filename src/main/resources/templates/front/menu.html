@@ -13,7 +13,6 @@
     <link th:href="@{/assets/vendor/swiper/swiper-bundle.min.css}" rel="stylesheet">
     <link th:href="@{/assets/css/main.css}" rel="stylesheet">
     <style>
-        /* Sizin XÜSUSİ Stiliniz burada qalır */
         .menu-section {
             padding: 120px 0 80px 0; /* Header-in altından başlamaq üçün padding-i artırdım */
             background-color: #f7f7f7;
@@ -44,7 +43,7 @@
 </head>
 <body class="index-page">
 
-<header th:replace="front/fragments/header :: header"></header>
+<header th:replace="~{front/fragments/header :: header}"></header>
 
 <main id="main" class="main">
     <section class="menu-section">
@@ -60,7 +59,9 @@
                 <div th:each="product : ${products}" class="col-lg-4 col-md-6 mb-4">
                     <div class="card product-card h-100">
 
-                        <img th:src="${product.photoUrl}"
+                        <!-- photoUrl boş/null olsa sınıq şəkil əvəzinə
+                             ehtiyat (fallback) şəkil göstərilir. -->
+                        <img th:src="${product.photoUrl != null and !#strings.isEmpty(product.photoUrl)} ? ${product.photoUrl} : @{/assets/img/menu/menu-item-1.png}"
                              th:alt="${product.name}"
                              class="card-img-top">
 
@@ -89,7 +90,15 @@
     </section>
 </main>
 
-<footer th:replace="front/fragments/footer :: footer"></footer>
+<footer th:replace="~{front/fragments/footer :: footer}"></footer>
+
+<!--JS faylları - bunlar olmadan yuxarıdakı CSS-lər (bootstrap,
+     aos, glightbox, swiper) heç bir funksionallıq gətirmir, yalnız stil verir. -->
+<script th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/vendor/aos/aos.js}"></script>
+<script th:src="@{/assets/vendor/glightbox/js/glightbox.min.js}"></script>
+<script th:src="@{/assets/vendor/swiper/swiper-bundle.min.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
 
 </body>
 </html>

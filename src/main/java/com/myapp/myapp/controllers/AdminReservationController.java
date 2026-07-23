@@ -16,7 +16,6 @@ public class AdminReservationController {
 
     private final ReservationService reservationService;
 
-    // Constructor Injection
     public AdminReservationController(
             ReservationService reservationService
     ) {
@@ -36,8 +35,14 @@ public class AdminReservationController {
                 reservationService.getAllReservations()
         );
 
+        // DÜZƏLDİLDİ: "statuses" heç vaxt model-ə əlavə olunmurdu - template-də
+        // (reservation-list.html) status dəyişmə dropdown-u həmişə boş qalırdı.
+        // SİLİNDİ: (heç bir statuses sətri yox idi)
+        model.addAttribute("statuses", ReservationStatus.values());
+
         return "admin/reservations/reservation-list";
     }
+
     /**
      * Seçilmiş rezervasiyanın bütün məlumatlarını göstərir.
      */
@@ -98,8 +103,13 @@ public class AdminReservationController {
                 status
         );
 
+        // ƏLAVƏ EDİLDİ: eyni səbəbdən bura da lazımdır - bu view də
+        // eyni template-i (reservation-list) istifadə edir.
+        model.addAttribute("statuses", ReservationStatus.values());
+
         return "admin/reservations/reservation-list";
     }
+
     /**
      * Admin rezervasiyanın statusunu dəyişə bilər.
      */

@@ -17,6 +17,7 @@
     <div class="card p-4">
         <h1 class="card-title text-center mb-4">Yeni Müştəri Əlavə Et</h1>
         <form th:action="@{/admin/clients/add}" th:object="${clientCreateDto}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
             <div class="mb-3">
                 <label for="name" class="form-label">Ad:</label>
                 <input type="text" id="name" th:field="*{name}" class="form-control" required>

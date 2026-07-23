@@ -48,19 +48,51 @@ public class ContactServiceImpl implements ContactService {
         return savedMessage;
     }
 
+    /**
+     * DÜZƏLDİLDİ: Bu metod "return List.of();" edən boş stub idi - yəni
+     * admin panelində bazada real mesajlar olsa belə, həmişə boş siyahı
+     * göstərilirdi ("Hələ heç bir əlaqə mesajı yoxdur" mesajı yalan idi).
+     *
+     * SİLİNDİ: public List<Contact> getAllMessages() { return List.of(); }
+     *
+     * ƏVƏZİNƏ: bazadan real mesajlar, ən yenidən köhnəyə sıralı gətirilir.
+     */
     @Override
+    @Transactional(readOnly = true)
     public List<Contact> getAllMessages() {
-        return List.of();
+        return contactRepository.findAllByOrderByReceivedAtDesc();
     }
 
+    /**
+     * DÜZƏLDİLDİ: Bu metod "return false;" edən boş stub idi - silmə
+     * əməliyyatı heç vaxt baş vermirdi, admin panelində "Sil" düyməsi
+     * basılanda mesaj bazada qalırdı, amma "uğursuz" mesajı göstərilirdi.
+     *
+     * SİLİNDİ: public boolean deleteMessage(Long id) { return false; }
+     *
+     * ƏVƏZİNƏ: mesajın mövcudluğu yoxlanılır, varsa silinir.
+     */
     @Override
+    @Transactional
     public boolean deleteMessage(Long id) {
+        if (contactRepository.existsById(id)) {
+            contactRepository.deleteById(id);
+            return true;
+        }
         return false;
     }
 
+    /**
+     * DÜZƏLDİLDİ: Bu metod "return 0;" edən boş stub idi.
+     *
+     * SİLİNDİ: public long countMessages() { return 0; }
+     *
+     * ƏVƏZİNƏ: real say bazadan gətirilir.
+     */
     @Override
+    @Transactional(readOnly = true)
     public long countMessages() {
-        return 0;
+        return contactRepository.count();
     }
 
     private void sendAdminNotification(Contact contact) {
@@ -80,4 +112,6 @@ public class ContactServiceImpl implements ContactService {
         } catch (Exception e) {
             // Mail göndərilməsində xəta olsa da, tranzaksiya tamamlanır (bazaya yazılır).
             System.err.println("XƏTA: Adminə kontakt maili göndərilərkən xəta: " + e.getMessage());
-        }}}
+        }
+    }
+}

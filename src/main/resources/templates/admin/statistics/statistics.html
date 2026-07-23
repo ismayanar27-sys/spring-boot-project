@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="az" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Statistika | Restaurant Management System</title>
+
+    <link th:href="@{/assets/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/assets/vendor/bootstrap-icons/bootstrap-icons.css}" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container py-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+
+        <div>
+            <h2 class="fw-bold">
+                <i class="bi bi-bar-chart"></i>
+                Statistika
+            </h2>
+            <p class="text-muted mb-0">Ümumi biznes göstəriciləri</p>
+        </div>
+
+        <a th:href="@{/admin}" class="btn btn-outline-secondary">
+            ← Admin Panel
+        </a>
+
+    </div>
+
+    <!-- Ümumi saylar -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold mb-0" th:text="${productCount}">0</h3>
+                    <p class="text-muted mb-0">Məhsul</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold mb-0" th:text="${clientCount}">0</h3>
+                    <p class="text-muted mb-0">Müştəri</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold mb-0" th:text="${orderTotal}">0</h3>
+                    <p class="text-muted mb-0">Sifariş</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h3 class="fw-bold mb-0" th:text="${messageCount}">0</h3>
+                    <p class="text-muted mb-0">Əlaqə Mesajı</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gəlir -->
+    <div class="card shadow-sm mb-4 border-success">
+        <div class="card-body text-center">
+            <p class="text-muted mb-1">Ümumi Gəlir (yalnız ödənilmiş sifarişlər)</p>
+            <h2 class="fw-bold text-success mb-0">
+                <span th:text="${totalRevenue}">0</span> AZN
+            </h2>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Sifariş statusu bölgüsü -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <i class="bi bi-receipt"></i>
+                    Sifarişlər — Status üzrə bölgü
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                        <tr>
+                            <td>Hazırlanır (PENDING)</td>
+                            <td class="text-end fw-bold" th:text="${orderPending}">0</td>
+                        </tr>
+                        <tr>
+                            <td>Ödənildi (PAID)</td>
+                            <td class="text-end fw-bold text-success" th:text="${orderPaid}">0</td>
+                        </tr>
+                        <tr>
+                            <td>Uğursuz (FAILED)</td>
+                            <td class="text-end fw-bold text-danger" th:text="${orderFailed}">0</td>
+                        </tr>
+                        <tr>
+                            <td>Göndərildi (DELIVERED)</td>
+                            <td class="text-end fw-bold" th:text="${orderDelivered}">0</td>
+                        </tr>
+                        <tr>
+                            <td>Ləğv edildi (CANCELLED)</td>
+                            <td class="text-end fw-bold text-muted" th:text="${orderCancelled}">0</td>
+                        </tr>
+                        <tr class="border-top">
+                            <td class="fw-bold">Cəmi</td>
+                            <td class="text-end fw-bold" th:text="${orderTotal}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rezervasiya statusu bölgüsü -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <i class="bi bi-calendar-check"></i>
+                    Rezervasiyalar — Status üzrə bölgü
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                        <tr>
+                            <td>Gözləyir (PENDING)</td>
+                            <td class="text-end fw-bold" th:text="${reservationPending}">0</td>
+                        </tr>
+                        <tr>
+                            <td>Təsdiqləndi (CONFIRMED)</td>
+                            <td class="text-end fw-bold text-success" th:text="${reservationConfirmed}">0</td>
+                        </tr>
+                        <tr>
+                            <td>Tamamlandı (COMPLETED)</td>
+                            <td class="text-end fw-bold" th:text="${reservationCompleted}">0</td>
+                        </tr>
+                        <tr>
+                            <td>Ləğv edildi (CANCELLED)</td>
+                            <td class="text-end fw-bold text-muted" th:text="${reservationCancelled}">0</td>
+                        </tr>
+                        <tr class="border-top">
+                            <td class="fw-bold">Cəmi (aktiv)</td>
+                            <td class="text-end fw-bold" th:text="${reservationTotal}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+</html>

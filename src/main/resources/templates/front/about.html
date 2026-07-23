@@ -2,15 +2,43 @@
 <html lang="az" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Haqqımızda | Yummy. Veb Saytınız</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${pageTitle} ? ${pageTitle} : 'Haqqımızda | Restoran'">Haqqımızda | Restoran</title>
+
+  <!--CDN-dən yüklənən Bootstrap/İkonlar silindi, əvəzinə
+       layihənin özündə saxlanılan lokal vendor faylları istifadə olunur -
+       digər səhifələrlə (contact.html, menu.html) eyni mənbədən yüklənsin
+       və eyni versiya işlədilsin deyə. main.css və aos.css də əlavə olundu -
+       bunlar olmadan səhifə saytın əsas rəng/şrift temasından fərqli görünürdü. -->
+  <link th:href="@{/assets/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{/assets/vendor/bootstrap-icons/bootstrap-icons.css}" rel="stylesheet">
+  <link th:href="@{/assets/vendor/aos/aos.css}" rel="stylesheet">
+  <link th:href="@{/assets/css/main.css}" rel="stylesheet">
+
+  <link th:href="@{/assets/img/favicon.png}" rel="icon">
+
   <style>
     .about-section {
         padding: 80px 0;
         background-color: #f8f8f8;
     }
     .about-content h2 {
-        color: #ffb03c; /* Rənginizi tənzimləyin */
+        color: #ffb03c;
         font-weight: 700;
+    }
+    .about-content ul {
+        list-style: none;
+        padding-left: 0;
+    }
+    .about-content ul li {
+        padding-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .about-content ul li i {
+        color: #ffb03c;
+        font-size: 1.2rem;
     }
     .about-image {
         overflow: hidden;
@@ -20,41 +48,61 @@
     .about-image img {
         width: 100%;
         height: auto;
+        object-fit: cover;
         display: block;
     }
   </style>
 </head>
-<body>
+<body class="index-page">
+
+<header th:replace="~{front/fragments/header :: header}"></header>
 
 <section id="about" class="about-section">
   <div class="container">
     <div class="row align-items-center">
 
+      <!-- Content Area -->
       <div class="col-lg-6 about-content">
-        <h2 class="display-5">Bizim Hekayəmiz</h2>
-        <p class="fst-italic">
-          "Yummy." yalnız bir restoran deyil, ləzzət və keyfiyyətin birləşdiyi məkandır.
+        <h2 class="display-5" th:text="${aboutTitle} ? ${aboutTitle} : 'Bizim Hekayəmiz'">Bizim Hekayəmiz</h2>
+
+        <p class="fst-italic" th:text="${aboutSubtitle} ? ${aboutSubtitle} : '&quot;Restoran.&quot; yalnız bir restoran deyil, ləzzət və keyfiyyətin birləşdiyi məkandır.'">
+          "Restoran." yalnız bir restoran deyil, ləzzət və keyfiyyətin birləşdiyi məkandır.
         </p>
-        <p>
+
+        <p th:text="${aboutDescription} ? ${aboutDescription} : '2015-ci ildən bəri biz müştərilərimizə unudulmaz təamlar təqdim etməyə çalışırıq. Məqsədimiz hər bir qonağın süfrəmizdən xoşbəxt ayrılmasıdır.'">
           2015-ci ildən bəri biz müştərilərimizə unudulmaz təamlar təqdim etməyə çalışırıq. Məqsədimiz hər bir qonağın süfrəmizdən xoşbəxt ayrılmasıdır.
         </p>
+
         <ul>
-          <li><i class="bi bi-check-circle"></i> Yalnız təzə və yerli məhsullardan istifadə.</li>
-          <li><i class="bi bi-check-circle"></i> Peşəkar aşpazlar komandası.</li>
-          <li><i class="bi bi-check-circle"></i> İstənilən tədbir üçün xüsusi menyu seçimləri.</li>
+          <li><i class="bi bi-check-circle-fill"></i> Yalnız təzə və yerli məhsullardan istifadə.</li>
+          <li><i class="bi bi-check-circle-fill"></i> Peşəkar aşpazlar komandası.</li>
+          <li><i class="bi bi-check-circle-fill"></i> İstənilən tədbir üçün xüsusi menyu seçimləri.</li>
         </ul>
+
         <p>
           Bizim üçün keyfiyyət hər şeydən önəmlidir. Buna görə də hər bir ləzzətin hazırlanmasına xüsusi sevgi və qayğı ilə yanaşırıq.
         </p>
       </div>
 
-      <div class="col-lg-6 pt-4 pt-lg-0 about-image">
-        <img th:src="@{/assets/img/about-us.jpg}" alt="Haqqımızda şəkil">
+      <!-- Image Area -->
+      <div class="col-lg-6 pt-4 pt-lg-0">
+        <div class="about-image">
+          <!-- Əgər bazadan/Cloudinary-dən dinamik URL gəlirsə th:src ilə onu veririk, yoxdursa static şəkil açılır -->
+          <img th:src="${aboutImageUrl} ? ${aboutImageUrl} : @{/assets/img/about-us.jpg}"
+               alt="Haqqımızda şəkil"
+               class="img-fluid">
+        </div>
       </div>
 
     </div>
   </div>
 </section>
+
+<footer th:replace="~{front/fragments/footer :: footer}"></footer>
+
+<script th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/assets/vendor/aos/aos.js}"></script>
+<script th:src="@{/assets/js/main.js}"></script>
 
 </body>
 </html>

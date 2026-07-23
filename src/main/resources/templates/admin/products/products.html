@@ -27,8 +27,6 @@
 <div class="container">
   <h1 class="mb-4">Məhsulların Siyahısı</h1>
 
-  <!-- UĞUR VƏ XƏTA MESAJLARI (Bootstrap Alert-Dismissible əlavə edildi) -->
-  <!-- Uğur Mesajı -->
   <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
     <span th:text="${successMessage}">Uğurlu əməliyyat mesajı.</span>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -86,6 +84,8 @@
       <td class="action-buttons">
         <a th:href="@{/admin/products/edit/{id}(id=${product.id})}" class="btn btn-sm btn-warning">Düzəliş Et</a>
         <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post" style="display:inline;">
+          <!-- CSRF token - bunsuz forma 403 Forbidden verə bilər -->
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
           <!-- Təqdimat üçün alert funksiyasını işlək saxlayırıq -->
           <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Məhsulu silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarılmır.');">Sil</button>
         </form>
@@ -94,13 +94,13 @@
     <!-- Məhsul yoxdursa boş sətir göstər -->
     <tr th:if="${products.empty}">
       <td colspan="9" class="text-center p-4">
-        Axtarışınıza uyğun **məhsul tapılmadı**. Zəhmət olmasa axtarış sözünü dəyişdirin və ya <a th:href="@{/admin/products}" class="alert-link">bütün məhsullara</a> baxın.
+        Axtarışınıza uyğun məhsul tapılmadı. Zəhmət olmasa axtarış sözünü dəyişdirin və ya <a th:href="@{/admin/products}" class="alert-link">bütün məhsullara</a> baxın.
       </td>
     </tr>
     </tbody>
   </table>
 
-  <!-- Səhifələşdirmə (Əgər əlavə etsəniz, bura yerləşdiriləcək) -->
+  <!-- Səhifələşdirmə -->
   <nav aria-label="Səhifələr" th:if="${!products.empty}">
     <ul class="pagination justify-content-center">
       <!-- Səhifələşdirmə elementi əlavə oluna bilər -->

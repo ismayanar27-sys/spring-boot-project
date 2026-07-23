@@ -241,4 +241,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         return true;
     }
+
+    @Override
+    public Object countReservationsByStatus(ReservationStatus reservationStatus) {
+        return null;
+    }
 }

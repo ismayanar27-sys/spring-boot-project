@@ -25,7 +25,10 @@
               enctype="multipart/form-data"
               class="needs-validation" novalidate>
 
-            <!-- 1. MƏHSUL ADI (name) -->
+            <!-- ƏLAVƏ EDİLDİ: CSRF token - bunsuz forma 403 Forbidden verə bilər -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <!-- 1. MƏHSUL ADI -->
             <div class="mb-3">
                 <label for="name" class="form-label">Ad</label>
                 <input type="text"
@@ -127,10 +130,8 @@
                     <div th:if="${#fields.hasErrors('scent')}" th:errors="*{scent}" class="invalid-feedback">Qoxu sahəsi üçün xəta.</div>
                 </div>
             </div>
-            <!-- ƏLAVƏ SAHƏLƏRİN SONU -->
 
-
-            <!-- 4. ŞƏKİL FAYLI (image) -->
+            <!-- 4. ŞƏKİL FAYLI -->
             <div class="mb-3">
                 <label for="image" class="form-label">Şəkil Faylı</label>
                 <input type="file"

@@ -29,6 +29,9 @@
   <div class="card p-4">
     <h1 class="card-title text-center mb-4">Müştəri Məlumatlarını Yenilə</h1>
     <form th:action="@{/admin/clients/update/{id}(id=${clientUpDateDto.id})}" th:object="${clientUpDateDto}" method="post">
+
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
       <input type="hidden" th:field="*{id}" />
       <div class="mb-3">
         <label for="name" class="form-label">Ad:</label>

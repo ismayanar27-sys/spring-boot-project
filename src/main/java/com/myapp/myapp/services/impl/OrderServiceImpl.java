@@ -287,4 +287,14 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.count();
     }
 
+    @Override
+    public long countOrdersByStatus(OrderStatus status) {
+        return 0;
+    }
+
+    @Override
+    public BigDecimal getTotalRevenue() {
+        return null;
+    }
+
 }

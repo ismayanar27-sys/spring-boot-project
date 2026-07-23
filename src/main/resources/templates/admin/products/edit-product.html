@@ -27,8 +27,6 @@
 <div class="container">
     <div class="card p-4 shadow-lg">
         <h1 class="card-title text-center mb-4 text-warning">Məhsulu Redaktə Et</h1>
-
-        <!-- Uğur və Xəta Mesajları (Flash attributes, formadan kənarda qala bilər) -->
         <div th:if="${successMessage}" class="alert alert-success text-center" role="alert" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="alert alert-danger text-center" role="alert" th:text="${errorMessage}"></div>
 
@@ -37,7 +35,9 @@
               method="post"
               enctype="multipart/form-data">
 
-            <!-- ƏSAS DÜZƏLİŞ: Ümumi (global) xətaları formanın içində göstəririk. -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <!-- Ümumi (global) xətaları formanın içində göstəririk. -->
             <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger text-center" role="alert">
                 <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
             </div>
@@ -121,7 +121,7 @@
                 <img th:src="*{photoUrl}" alt="Mövcud şəkil" class="img-preview">
             </div>
 
-            <!-- 9. Yeni Şəkil Yüklə (DÜZƏLİŞ: Thymeleaf xəta yoxlaması silinib) -->
+            <!-- 9. Yeni Şəkil Yüklə -->
             <div class="mb-3">
                 <label for="image" class="form-label">Yeni Şəkil Yüklə (isteğe bağlı):</label>
                 <input type="file" id="image" name="image" class="form-control" accept="image/*">

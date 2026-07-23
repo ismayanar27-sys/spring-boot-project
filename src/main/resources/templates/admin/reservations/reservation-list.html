@@ -100,14 +100,21 @@
                                     Details
                                 </a>
 
-                                <!-- Status dəyiş -->
-                                <form th:action="@{/admin/reservations/update-status}"
+                                <!-- DÜZƏLDİLDİ: forma "/admin/reservations/update-status" ünvanına
+                                     göndərirdi, amma controller-də belə bir mapping yoxdur - real
+                                     endpoint "/admin/reservations/{id}/status"-dur (path variable).
+                                     SİLİNDİ: th:action="@{/admin/reservations/update-status}" + hidden "id" input -->
+                                <form th:action="@{/admin/reservations/{id}/status(id=${res.id})}"
                                       method="post"
                                       class="d-flex gap-1">
 
+                                    <!-- ƏLAVƏ EDİLDİ: CSRF token. Bu layihədə
+                                         thymeleaf-extras-springsecurity6 asılılığı yoxdur, ona görə
+                                         token avtomatik yeridilmir - əl ilə yazılmalıdır, yoxsa
+                                         Spring Security bu POST sorğusunu 403 Forbidden ilə rədd edər. -->
                                     <input type="hidden"
-                                           name="id"
-                                           th:value="${res.id}"/>
+                                           th:name="${_csrf.parameterName}"
+                                           th:value="${_csrf.token}"/>
 
                                     <select name="status"
                                             class="form-select form-select-sm">

@@ -44,6 +44,9 @@
 
     <h4 class="mt-4">Sifariş Statusunu Dəyiş</h4>
     <form th:action="@{'/admin/orders/' + ${order.id} + '/update-status'}" method="post" class="mb-4">
+
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
       <div class="input-group">
         <select class="form-select" name="status">
           <option th:value="'Hazırlanır'" th:selected="${order.status == 'Hazırlanır'}">Hazırlanır</option>

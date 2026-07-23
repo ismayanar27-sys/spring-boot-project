@@ -2,6 +2,9 @@ package com.myapp.myapp.services;
 
 import com.myapp.myapp.dtos.OrderCreateDto;
 import com.myapp.myapp.dtos.OrderDto;
+import com.myapp.myapp.models.OrderStatus;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface OrderService {
@@ -32,4 +35,10 @@ public interface OrderService {
     OrderDto confirmPaymentByTransactionId(String transactionId, boolean success);
 
     Long countOrders();
+
+    // Statistics səhifəsi üçün: statusa görə sifariş sayı
+    long countOrdersByStatus(OrderStatus status);
+
+    // Statistics səhifəsi üçün: yalnız PAID sifarişlərin ümumi məbləği
+    BigDecimal getTotalRevenue();
 }
