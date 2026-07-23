@@ -28,8 +28,7 @@ public class PaymentController {
 
     // Portmanat.az tərəfindən göndərilən geri dönüş sorğusunu idarə edir.
     // URL: /api/payments/callback?status=ok&transactionId=...&sign=...
-    //
-    // QEYD: "sign" parametri hələ göndərilmir (kart inteqrasiyası hazır deyil) -
+    //"sign" parametri hələ göndərilmir (kart inteqrasiyası hazır deyil) -
     // ona görə "required = false" qoyulub, kart olmadan da 400 xətası vermir.
     @GetMapping("/callback")
     public String handlePaymentCallback(

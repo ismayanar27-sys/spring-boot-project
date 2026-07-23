@@ -61,7 +61,7 @@
 
                         <!-- photoUrl boş/null olsa sınıq şəkil əvəzinə
                              ehtiyat (fallback) şəkil göstərilir. -->
-                        <img th:src="${product.photoUrl != null and !#strings.isEmpty(product.photoUrl)} ? ${product.photoUrl} : @{/assets/img/menu/menu-item-1.png}"
+                        <img th:src="${#strings.isEmpty(product.photoUrl)} ? @{/assets/img/menu/menu-item-1.png} : @{${product.photoUrl}}"
                              th:alt="${product.name}"
                              class="card-img-top">
 
@@ -80,7 +80,7 @@
                     </div>
                 </div>
 
-                <div th:if="${products.isEmpty()}" class="col-12 text-center py-5">
+                <div th:if="${products == null or #lists.isEmpty(products)}" class="col-12 text-center py-5">
                     <h3 class="text-muted">Təəssüf ki, hazırda məhsul yoxdur.</h3>
                     <p>Zəhmət olmasa Admin Panelindən məhsul əlavə edin.</p>
                 </div>
@@ -92,8 +92,6 @@
 
 <footer th:replace="~{front/fragments/footer :: footer}"></footer>
 
-<!--JS faylları - bunlar olmadan yuxarıdakı CSS-lər (bootstrap,
-     aos, glightbox, swiper) heç bir funksionallıq gətirmir, yalnız stil verir. -->
 <script th:src="@{/assets/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/assets/vendor/aos/aos.js}"></script>
 <script th:src="@{/assets/vendor/glightbox/js/glightbox.min.js}"></script>

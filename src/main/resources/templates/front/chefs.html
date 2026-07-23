@@ -78,20 +78,19 @@
 
                 <!-- Dinamik Aşpaz Siyahısı Dövrü -->
                 <div th:each="chef : ${chefs}"
-                     th:unless="${#lists.isEmpty(chefs)}"
                      class="col-lg-4 col-md-6"
                      data-aos="fade-up">
 
                     <div class="chef-member h-100">
                         <!-- Şəkil Yoxlaması (Null/Empty Fallback) -->
-                        <img th:src="${chef.photoUrl != null and !#strings.isEmpty(chef.photoUrl)} ? ${chef.photoUrl} : @{/assets/img/chefs/default-chef.jpg}"
+                        <img th:src="${#strings.isEmpty(chef.photoUrl)} ? @{/assets/img/chefs/default-chef.jpg} : @{${chef.photoUrl}}"
                              th:alt="${chef.fullName}"
                              class="img-fluid">
 
                         <h4 th:text="${chef.fullName}">Əli Əliyev</h4>
                         <span th:text="${chef.position}">Baş Aşpaz</span>
 
-                        <p class="chef-bio" th:text="${chef.bio != null} ? ${chef.bio} : 'Məlumat daxil edilməyib.'">
+                        <p class="chef-bio" th:text="${!#strings.isEmpty(chef.bio)} ? ${chef.bio} : 'Məlumat daxil edilməyib.'">
                             Aşpaz haqqında qısa bioqrafiya...
                         </p>
                     </div>
