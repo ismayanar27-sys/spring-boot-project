@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Elvis operatoru vasitəsilə daha təmiz yazılış -->
   <title th:text="${pageTitle} ?: 'Haqqımızda | Restoran'">Haqqımızda | Restoran</title>
 
   <link th:href="@{/assets/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
@@ -62,9 +61,8 @@
       <div class="col-lg-6 about-content">
         <h2 class="display-5" th:text="${aboutTitle} ?: 'Bizim Hekayəmiz'">Bizim Hekayəmiz</h2>
 
-        <!-- &quot; xətası düzəldildi, dırnaqlar mətnin özünə daxil edildi -->
-        <p class="fst-italic" th:text="${aboutSubtitle} ?: 'Restoran yalnız bir restoran deyil, ləzzət və keyfiyyətin birləşdiyi məkandır.'">
-          "Restoran." yalnız bir restoran deyil, ləzzət və keyfiyyətin birləşdiyi məkandır.
+        <p class="fst-italic" th:text="${aboutSubtitle} ?: '&quot;Restoran&quot; sadəcə bir yeməkxana deyil, ləzzət və keyfiyyətin birləşdiyi məkandır.'">
+          "Restoran" sadəcə bir yeməkxana deyil, ləzzət və keyfiyyətin birləşdiyi məkandır.
         </p>
 
         <p th:text="${aboutDescription} ?: '2015-ci ildən bəri biz müştərilərimizə unudulmaz təamlar təqdim etməyə çalışırıq. Məqsədimiz hər bir qonağın süfrəmizdən xoşbəxt ayrılmasıdır.'">
@@ -85,7 +83,7 @@
       <!-- Image Area -->
       <div class="col-lg-6 pt-4 pt-lg-0">
         <div class="about-image">
-          <img th:src="${aboutImageUrl} ?: @{/assets/img/about-us.jpg}"
+          <img th:src="${aboutImageUrl != null and !#strings.isEmpty(aboutImageUrl)} ? ${aboutImageUrl} : @{/assets/img/about-us.jpg}"
                alt="Haqqımızda şəkil"
                class="img-fluid">
         </div>
