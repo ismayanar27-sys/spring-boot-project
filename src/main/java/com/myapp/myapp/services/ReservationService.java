@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ReservationService {
 
-    /* Reservation artıq yalnız bazaya yazılmır
+    /* Reservation yalnız bazaya yazılmır
      * Tarix + saat və restaurant capacity yoxlamaları
      * Service qatında aparılır
      * Buna görə əməliyyatın uğurlu olub-olmadığını
@@ -31,5 +31,6 @@ public interface ReservationService {
     // Admin rezervasiyanın statusunu dəyişə bilir
     boolean updateReservationStatus(Long id, ReservationStatus status);
 
-    Object countReservationsByStatus(ReservationStatus reservationStatus);
+
+    long countReservationsByStatus(ReservationStatus reservationStatus);
 }

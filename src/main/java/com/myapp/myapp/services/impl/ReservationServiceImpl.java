@@ -147,16 +147,6 @@ public class ReservationServiceImpl implements ReservationService {
 
     /**
      * Bazadakı bütün aktiv (CANCELLED olmayan) rezervasiyaların sayını qaytarır.
-     *
-     * DÜZƏLDİLDİ: Əvvəlki versiyada `findAll()` ilə BÜTÜN cədvəl yaddaşa
-     * çəkilib, sonra Java tərəfində `.stream().filter(...).count()` ilə
-     * sayılırdı. Bu, yalnız bir ədəd lazım olan yerdə bütün sətirləri
-     * (adları, telefonları, mesajları və s.) lüzumsuz yerə bazadan çəkir.
-     *
-     * SİLİNDİ: reservationRepository.findAll().stream().filter(r -> r.getStatus() != ReservationStatus.CANCELLED).count()
-     *
-     * ƏVƏZİNƏ: `ReservationRepository.countByStatusNot(...)` istifadə olunur -
-     * bu, bazada birbaşa "SELECT COUNT(*) ... WHERE status <> ?" işlədir.
      */
     @Override
     @Transactional(readOnly = true)
@@ -167,11 +157,6 @@ public class ReservationServiceImpl implements ReservationService {
 
     /**
      * Admin panel üçün bütün rezervasiyaları qaytarır.
-     *
-     * DÜZƏLDİLDİ: `findAll()` (sıralanmamış) əvəzinə `findAllByOrderByCreatedAtDesc()`
-     * istifadə olunur ki, admin panelində ən yeni rezervasiyalar yuxarıda görünsün.
-     *
-     * SİLİNDİ: reservationRepository.findAll();
      */
     @Override
     @Transactional(readOnly = true)
@@ -191,27 +176,12 @@ public class ReservationServiceImpl implements ReservationService {
                 .orElse(null);
     }
 
-    /**
-     * Statusa görə rezervasiyaları filter edir.
-     *
-     * DÜZƏLDİLDİ: Əvvəlki versiyada `findAll()` ilə BÜTÜN cədvəl yaddaşa
-     * çəkilib, sonra Java tərəfində `.stream().filter(...)` ilə statusa
-     * görə süzülürdü - filtrasiya bazanın WHERE şərti (indeksli sütun
-     * üzərində) əvəzinə tətbiqin özündə, indekssiz şəkildə aparılırdı.
-     *
-     * SİLİNDİ: reservationRepository.findAll().stream().filter(r -> r.getStatus() == status).toList()
-     *
-     * ƏVƏZİNƏ: artıq mövcud olan `ReservationRepository.findByStatus(status)`
-     * metodu istifadə olunur - filtrasiya birbaşa SQL-in WHERE şərti ilə,
-     * bazanın özündə aparılır.
-     */
     @Override
     @Transactional(readOnly = true)
     public List<Reservation> getReservationsByStatus(ReservationStatus status) {
 
         return reservationRepository.findByStatus(status);
     }
-
     /**
      * Admin paneldən reservation statusunu dəyişir.
      */
@@ -238,12 +208,11 @@ public class ReservationServiceImpl implements ReservationService {
                 id,
                 status
         );
-
         return true;
     }
-
     @Override
-    public Object countReservationsByStatus(ReservationStatus reservationStatus) {
-        return null;
+    @Transactional(readOnly = true)
+    public long countReservationsByStatus(ReservationStatus reservationStatus) {
+        return reservationRepository.countByStatus(reservationStatus);
     }
 }

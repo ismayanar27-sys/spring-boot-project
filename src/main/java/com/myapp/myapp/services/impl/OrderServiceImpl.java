@@ -134,8 +134,8 @@ public class OrderServiceImpl implements OrderService {
                             new EntityNotFoundException(
                                     "Məhsul tapılmadı, ID: "
                                             + itemDto.getProductId()
-                            )
-                    );
+                            ));
+
 
             OrderItem orderItem = new OrderItem();
 
@@ -288,13 +288,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public long countOrdersByStatus(OrderStatus status) {
-        return 0;
+        return orderRepository.countByStatus(status);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BigDecimal getTotalRevenue() {
-        return null;
+        return orderRepository.sumTotalAmountByStatus(OrderStatus.PAID);
     }
 
 }
